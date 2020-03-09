@@ -114,6 +114,34 @@ public class BaseEnumManager {
     }
 
     /**
+     * 调查对象
+     */
+    public enum ObjectTypeEnum{
+        Patient("患者", 1),
+        PatientFamily("患者家属", 2),
+
+        Doctor("医生", 3),
+        Nurse("护士", 4),
+//        MedicalTechnician("医技人员", 5),
+//        Management("管理人员", 6),
+        Other("其他", 7);
+
+        private final String value;
+        private final int key;
+
+        ObjectTypeEnum(String value, int key) {
+            this.value = value;
+            this.key = key;
+        }
+        public String value() {
+            return this.value;
+        }
+        public int key() {
+            return this.key;
+        }
+    }
+
+    /**
      * 账号类型
      */
     public enum AccountTypeEnum{

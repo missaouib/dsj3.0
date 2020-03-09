@@ -100,6 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 				.antMatchers(
 						"/security/**",
+						"/question/**",
 						"/main/login",
 						"/main/login-view",
 						"/favicon.ico").permitAll()
