@@ -11,7 +11,6 @@ import com.hanqian.kepler.common.enums.BaseEnumManager;
 import com.hanqian.kepler.common.enums.DictEnum;
 import com.hanqian.kepler.common.jpa.specification.Rule;
 import com.hanqian.kepler.common.jpa.specification.SpecificationFactory;
-import com.hanqian.kepler.common.utils.RedisUtil;
 import com.hanqian.kepler.core.entity.primary.sys.Department;
 import com.hanqian.kepler.core.service.flow.ProcessBriefService;
 import com.hanqian.kepler.core.service.flow.ProcessStepService;
@@ -55,8 +54,6 @@ public class KeplerTest {
 	private ProcessBriefService processBriefService;
 	@Autowired
 	private ProcessStepService processStepService;
-	@Autowired
-	private RedisUtil redisUtil;
 
 	Logger logger = LoggerFactory.getLogger(getClass());
 
