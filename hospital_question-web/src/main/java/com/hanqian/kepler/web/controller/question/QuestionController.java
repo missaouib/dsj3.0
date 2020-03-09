@@ -30,6 +30,7 @@ public class QuestionController extends BaseController {
     @GetMapping("save")
     @ResponseBody
     public Object save(Question question){
+        logger.info(StrUtil.format("READY SAVE ->【{}】", JSONUtil.toJsonStr(question)));
 
         if(StrUtil.isBlank(question.getHospitalName())) return AjaxResult.error("未获取到所属医院【hospitalName】");
         if(ObjectUtil.isNull(question.getObjectType())) return AjaxResult.error("未获取到调查对象【ObjectType】");
