@@ -22,23 +22,21 @@ public class Question extends BaseEntity {
     private String hospitalName;
     /**
      * 调查对象
+     * Patient ： 患者（病患及病患家属）
+     * PatientFamily ： 患者家属（病患及病患家属）
+     * Doctor ： 医生（医护人员）
+     * Nurse ： 护士（医护人员）
+     * Other ： 其他（医护人员）
      */
     @Enumerated(EnumType.STRING)
     private BaseEnumManager.ObjectTypeEnum ObjectType;
     /**
      * 性别
+     * male ： 男
+     * female ： 女
      */
     @Enumerated(EnumType.STRING)
     private BaseEnumManager.SexEnum sex;
-    /**
-     * 年龄段（old）
-     * 1: 18岁以下
-     * 2 : 18~30
-     * 3 : 30~40
-     * 4 : 40~50
-     * 5 : 50~60
-     * 6 : 60岁以上
-     */
     /**
      * 年龄段（new）
      * 1: 18岁以下
