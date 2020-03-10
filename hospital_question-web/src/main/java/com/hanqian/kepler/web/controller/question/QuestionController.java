@@ -50,16 +50,16 @@ public class QuestionController extends BaseController {
 
         // ======== （餐品服务：医护人员版） ========
         if(StrUtil.equalsAny(question.getObjectType().name(), new String[]{BaseEnumManager.ObjectTypeEnum.Patient.name(), BaseEnumManager.ObjectTypeEnum.PatientFamily.name()})){
-            if(ObjectUtil.isNull(question.getDishPrice())) return AjaxResult.error("菜品价格 为空【dishPrice】");
-            if(ObjectUtil.isNull(question.getDiningEnvironment())) return AjaxResult.error("就餐环境 为空【diningEnvironment】");
-            if(ObjectUtil.isNull(question.getFoodService())) return AjaxResult.error("餐饮服务态度 为空【foodService】");
+	        if(ObjectUtil.isNull(question.getDeliveryTimeliness())) return AjaxResult.error("送餐的及时性 为空【deliveryTimeliness】");
+	        if(ObjectUtil.isNull(question.getFoodNutrition())) return AjaxResult.error("餐品口味营养 为空【foodNutrition】");
+	        if(ObjectUtil.isNull(question.getDiningAttitude())) return AjaxResult.error("送餐服务态度 为空【diningAttitude】");
         }
 
         // ======== （餐品服务：病患及病患家属版） ========
         if(StrUtil.equalsAny(question.getObjectType().name(), new String[]{BaseEnumManager.ObjectTypeEnum.Doctor.name(), BaseEnumManager.ObjectTypeEnum.Nurse.name(), BaseEnumManager.ObjectTypeEnum.Other.name()})){
-            if(ObjectUtil.isNull(question.getDeliveryTimeliness())) return AjaxResult.error("送餐的及时性 为空【deliveryTimeliness】");
-            if(ObjectUtil.isNull(question.getFoodNutrition())) return AjaxResult.error("餐品口味营养 为空【foodNutrition】");
-            if(ObjectUtil.isNull(question.getDiningAttitude())) return AjaxResult.error("送餐服务态度 为空【diningAttitude】");
+	        if(ObjectUtil.isNull(question.getDishPrice())) return AjaxResult.error("菜品价格 为空【dishPrice】");
+	        if(ObjectUtil.isNull(question.getDiningEnvironment())) return AjaxResult.error("就餐环境 为空【diningEnvironment】");
+	        if(ObjectUtil.isNull(question.getFoodService())) return AjaxResult.error("餐饮服务态度 为空【foodService】");
         }
 
         // ======== （运送服务） ========
