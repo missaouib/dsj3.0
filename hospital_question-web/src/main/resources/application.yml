@@ -64,6 +64,7 @@ logging:
   path: /kepler/log
 
 kepler:
+  questionLogMaxCount : 100
   formAuthUrl: /authentication/form
   smsAuthUrl: /authentication/mobile
 

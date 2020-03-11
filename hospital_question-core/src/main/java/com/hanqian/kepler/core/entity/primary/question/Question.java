@@ -29,7 +29,8 @@ public class Question extends BaseEntity {
      * Other ： 其他（医护人员）
      */
     @Enumerated(EnumType.STRING)
-    private BaseEnumManager.ObjectTypeEnum ObjectType;
+    private BaseEnumManager.ObjectTypeEnum objectType;
+    private Integer objectTypeSort;
     /**
      * 性别
      * male ： 男

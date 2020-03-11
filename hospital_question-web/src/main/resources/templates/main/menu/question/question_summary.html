@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<style>
+    .echart-div{
+        height: 400px;
+    }
+</style>
+
+<div id="page-content">
+    <div class="panel">
+        <div class="panel-heading">
+            <h3 class="panel-title">汇总统计</h3>
+        </div>
+        <div class="panel-body">
+            <!--搜索栏-->
+            <div class="row bord-btm pad-btm">
+                <form id="question_search_form">
+                    <div class="col-md-4 col-sm-12">
+                        <select id="hospitalName" class="form-control" name="hospitalName"></select>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group" id="dateSearchDiv">
+                            <input type="text" class="form-control" name="startDate" id="startDate" placeholder="开始时间">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control" name="endDate" id="endDate" placeholder="结束时间">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <button id="question-search-export" type="button" class="btn btn-success pull-right">导出</button>
+                        <button id="question-search-reset" type="reset" class="btn btn-default pull-right">重置</button>
+                        <button id="question-search-btn" type="button" class="btn btn-primary pull-right">搜索</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">调查对象</h3></div>
+                <div class="echart-div panel-body" id="question-objectType"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">性别</h3></div>
+                <div class="echart-div panel-body" id="question-sex"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">年龄段</h3></div>
+                <div class="echart-div panel-body" id="question-ageField"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">室内环境质量</h3></div>
+                <div class="echart-div panel-body" id="question-qualityIndoor"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">室外环境质量</h3></div>
+                <div class="echart-div panel-body" id="question-qualityOutdoor"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">厕所卫生状况</h3></div>
+                <div class="echart-div panel-body" id="question-toiletHygiene"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">保洁服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-cleanService"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">日常安保工作</h3></div>
+                <div class="echart-div panel-body" id="question-dailySecurity"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">意外处置及时性</h3></div>
+                <div class="echart-div panel-body" id="question-accidentalDisposal"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">安保服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-securityService"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">菜品价格</h3></div>
+                <div class="echart-div panel-body" id="question-dishPrice"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">就餐环境</h3></div>
+                <div class="echart-div panel-body" id="question-diningEnvironment"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">餐饮服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-foodService"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">送餐的及时性</h3></div>
+                <div class="echart-div panel-body" id="question-deliveryTimeliness"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">餐品口味营养</h3></div>
+                <div class="echart-div panel-body" id="question-foodNutrition"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">送餐服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-diningAttitude"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">运送及时性</h3></div>
+                <div class="echart-div panel-body" id="question-transportTimeliness"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">运送准确性</h3></div>
+                <div class="echart-div panel-body" id="question-transportAccuracy"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">运送服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-transportService"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">维修及时性</h3></div>
+                <div class="echart-div panel-body" id="question-repairTimeliness"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">维修质量</h3></div>
+                <div class="echart-div panel-body" id="question-repairQuality"></div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">电梯运状态</h3></div>
+                <div class="echart-div panel-body" id="question-elevatorStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-sm-12 eq-box-sm">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">运维服务态度</h3></div>
+                <div class="echart-div panel-body" id="question-operationService"></div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<script th:inline="javascript">
+    $(function(){
+        load_hospitalName_select();
+        __laydate_date("startDate");
+        __laydate_date("endDate");
+
+        load_echart();
+    });
+
+    //加载医院名搜索下拉框
+    function load_hospitalName_select(){
+        __ajax_get("/question/findHospitalNameList", {}, function(data){
+            if(data && data.state === 1){
+                var opData = [];
+                opData.push({id : "", text : ""});
+                for(var i=0;i<data.data.length;i++){
+                    var option = data.data[i];
+                    opData.push({id : option.name, text : option.value});
+                }
+                __select2("hospitalName", "请选择医院名称", {
+                    data : opData
+                });
+            }else{
+                __toastr_error("获取医院名称列表失败")
+            }
+        })
+    }
+
+    //执行搜索
+    $("#question-search-btn").on("click", function(){
+        load_echart();
+    });
+
+    //重置搜索栏
+    $("#question-search-reset").on("click", function(){
+        $("#hospitalName").val('').trigger('change');
+        setTimeout(function(){
+            load_echart();
+        }, 200);
+    });
+
+    //加载统计图（调查对象）
+    function load_echart(){
+        var params = $("#question_search_form").serialize();
+
+        //调查对象
+        var echartObj_objectType = echarts.init(document.getElementById("question-objectType"));
+        echartObj_objectType.showLoading();
+        __ajax_get("/question/bar_data_objectType", params, function(data){
+            question_bar_echarts(echartObj_objectType, data.xlist, data.ylist, "调查对象");
+        });
+
+        //性别
+        var echartObj_sex = echarts.init(document.getElementById("question-sex"));
+        echartObj_sex.showLoading();
+        __ajax_get("/question/bar_data_sex", params, function(data){
+            question_bar_echarts(echartObj_sex, data.xlist, data.ylist, "性别")
+        });
+
+        //年龄段
+        var echartObj_ageField = echarts.init(document.getElementById("question-ageField"));
+        echartObj_ageField.showLoading();
+        __ajax_get("/question/bar_data_ageField", params, function(data){
+            question_bar_echarts(echartObj_ageField, data.xlist, data.ylist, "年龄段")
+        });
+
+        //室内环境质量
+        var echartObj_qualityIndoor = echarts.init(document.getElementById("question-qualityIndoor"));
+        echartObj_qualityIndoor.showLoading();
+        __ajax_get("/question/bar_data?itemName=qualityIndoor", params, function(data){
+            question_bar_echarts(echartObj_qualityIndoor, data.xlist, data.ylist, "室内环境质量")
+        });
+
+        //室外环境质量
+        var echartObj_qualityOutdoor = echarts.init(document.getElementById("question-qualityOutdoor"));
+        echartObj_qualityOutdoor.showLoading();
+        __ajax_get("/question/bar_data?itemName=qualityOutdoor", params, function(data){
+            question_bar_echarts(echartObj_qualityOutdoor, data.xlist, data.ylist, "室外环境质量")
+        });
+
+        //厕所卫生状况
+        var echartObj_toiletHygiene = echarts.init(document.getElementById("question-toiletHygiene"));
+        echartObj_toiletHygiene.showLoading();
+        __ajax_get("/question/bar_data?itemName=toiletHygiene", params, function(data){
+            question_bar_echarts(echartObj_toiletHygiene, data.xlist, data.ylist, "厕所卫生状况")
+        });
+
+        //保洁服务态度
+        var echartObj_cleanService = echarts.init(document.getElementById("question-cleanService"));
+        echartObj_cleanService.showLoading();
+        __ajax_get("/question/bar_data?itemName=cleanService", params, function(data){
+            question_bar_echarts(echartObj_cleanService, data.xlist, data.ylist, "保洁服务态度")
+        });
+
+        //日常安保工作
+        var echartObj_dailySecurity = echarts.init(document.getElementById("question-dailySecurity"));
+        echartObj_dailySecurity.showLoading();
+        __ajax_get("/question/bar_data?itemName=dailySecurity", params, function(data){
+            question_bar_echarts(echartObj_dailySecurity, data.xlist, data.ylist, "日常安保工作")
+        });
+
+        //意外处置及时性
+        var echartObj_accidentalDisposal = echarts.init(document.getElementById("question-accidentalDisposal"));
+        echartObj_accidentalDisposal.showLoading();
+        __ajax_get("/question/bar_data?itemName=accidentalDisposal", params, function(data){
+            question_bar_echarts(echartObj_accidentalDisposal, data.xlist, data.ylist, "意外处置及时性")
+        });
+
+        //安保服务态度
+        var echartObj_securityService = echarts.init(document.getElementById("question-securityService"));
+        echartObj_securityService.showLoading();
+        __ajax_get("/question/bar_data?itemName=securityService", params, function(data){
+            question_bar_echarts(echartObj_securityService, data.xlist, data.ylist, "安保服务态度")
+        });
+
+        //菜品价格
+        var echartObj_dishPrice = echarts.init(document.getElementById("question-dishPrice"));
+        echartObj_dishPrice.showLoading();
+        __ajax_get("/question/bar_data?itemName=dishPrice", params, function(data){
+            question_bar_echarts(echartObj_dishPrice, data.xlist, data.ylist, "菜品价格")
+        });
+
+        //就餐环境
+        var echartObj_diningEnvironment = echarts.init(document.getElementById("question-diningEnvironment"));
+        echartObj_diningEnvironment.showLoading();
+        __ajax_get("/question/bar_data?itemName=diningEnvironment", params, function(data){
+            question_bar_echarts(echartObj_diningEnvironment, data.xlist, data.ylist, "就餐环境")
+        });
+
+        //餐饮服务态度
+        var echartObj_foodService = echarts.init(document.getElementById("question-foodService"));
+        echartObj_foodService.showLoading();
+        __ajax_get("/question/bar_data?itemName=foodService", params, function(data){
+            question_bar_echarts(echartObj_foodService, data.xlist, data.ylist, "餐饮服务态度")
+        });
+
+        //送餐的及时性
+        var echartObj_deliveryTimeliness = echarts.init(document.getElementById("question-deliveryTimeliness"));
+        echartObj_deliveryTimeliness.showLoading();
+        __ajax_get("/question/bar_data?itemName=deliveryTimeliness", params, function(data){
+            question_bar_echarts(echartObj_deliveryTimeliness, data.xlist, data.ylist, "送餐的及时性")
+        });
+
+        //餐品口味营养
+        var echartObj_foodNutrition = echarts.init(document.getElementById("question-foodNutrition"));
+        echartObj_foodNutrition.showLoading();
+        __ajax_get("/question/bar_data?itemName=foodNutrition", params, function(data){
+            question_bar_echarts(echartObj_foodNutrition, data.xlist, data.ylist, "餐品口味营养")
+        });
+
+        //送餐服务态度
+        var echartObj_diningAttitude = echarts.init(document.getElementById("question-diningAttitude"));
+        echartObj_diningAttitude.showLoading();
+        __ajax_get("/question/bar_data?itemName=diningAttitude", params, function(data){
+            question_bar_echarts(echartObj_diningAttitude, data.xlist, data.ylist, "送餐服务态度")
+        });
+
+        //运送及时性
+        var echartObj_transportTimeliness = echarts.init(document.getElementById("question-transportTimeliness"));
+        echartObj_transportTimeliness.showLoading();
+        __ajax_get("/question/bar_data?itemName=transportTimeliness", params, function(data){
+            question_bar_echarts(echartObj_transportTimeliness, data.xlist, data.ylist, "运送及时性")
+        });
+
+        //运送准确性
+        var echartObj_transportAccuracy = echarts.init(document.getElementById("question-transportAccuracy"));
+        echartObj_transportAccuracy.showLoading();
+        __ajax_get("/question/bar_data?itemName=transportAccuracy", params, function(data){
+            question_bar_echarts(echartObj_transportAccuracy, data.xlist, data.ylist, "运送准确性")
+        });
+
+        //运送服务态度
+        var echartObj_transportService = echarts.init(document.getElementById("question-transportService"));
+        echartObj_transportService.showLoading();
+        __ajax_get("/question/bar_data?itemName=transportService", params, function(data){
+            question_bar_echarts(echartObj_transportService, data.xlist, data.ylist, "运送服务态度")
+        });
+
+        //维修及时性
+        var echartObj_repairTimeliness = echarts.init(document.getElementById("question-repairTimeliness"));
+        echartObj_repairTimeliness.showLoading();
+        __ajax_get("/question/bar_data?itemName=repairTimeliness", params, function(data){
+            question_bar_echarts(echartObj_repairTimeliness, data.xlist, data.ylist, "维修及时性")
+        });
+
+        //维修质量
+        var echartObj_repairQuality = echarts.init(document.getElementById("question-repairQuality"));
+        echartObj_repairQuality.showLoading();
+        __ajax_get("/question/bar_data?itemName=repairQuality", params, function(data){
+            question_bar_echarts(echartObj_repairQuality, data.xlist, data.ylist, "维修质量")
+        });
+
+        //电梯运状态
+        var echartObj_elevatorStatus = echarts.init(document.getElementById("question-elevatorStatus"));
+        echartObj_elevatorStatus.showLoading();
+        __ajax_get("/question/bar_data?itemName=elevatorStatus", params, function(data){
+            question_bar_echarts(echartObj_elevatorStatus, data.xlist, data.ylist, "电梯运状态")
+        });
+
+        //运维服务态度
+        var echartObj_operationService = echarts.init(document.getElementById("question-operationService"));
+        echartObj_operationService.showLoading();
+        __ajax_get("/question/bar_data?itemName=operationService", params, function(data){
+            question_bar_echarts(echartObj_operationService, data.xlist, data.ylist, "运维服务态度")
+        });
+
+    }
+
+    // =================== 柱状统计图 ==========================
+    function question_bar_echarts(echartObj, xlist, ylist, name){
+        echartObj.hideLoading();
+        var defaults = {
+            color: ['#3398DB'],
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: xlist,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: name,
+                    type: 'bar',
+                    barWidth: '60%',
+                    data: ylist
+                }
+            ]
+        };
+
+        echartObj.setOption(defaults);
+
+    }
+
+</script>
+
+</html>

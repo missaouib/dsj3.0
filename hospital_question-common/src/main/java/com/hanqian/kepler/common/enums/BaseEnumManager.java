@@ -142,6 +142,39 @@ public class BaseEnumManager {
     }
 
     /**
+     * 医院名
+     */
+    public enum HospitalName{
+        JZ("精中医院"),
+        HD("华东医院"),
+        SY("第十人民医院"),
+        DYRM("第一人民医院"),
+        YY("岳阳医院"),
+        LH("龙华医院"),
+        XK("胸科医院"),
+        XH("新华医院"),
+        LY("第六人民医院");
+
+        private final String value;
+
+        HospitalName(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return value;
+        }
+    }
+
+
+
+
+
+
+
+
+
+    /**
      * 账号类型
      */
     public enum AccountTypeEnum{
@@ -164,21 +197,6 @@ public class BaseEnumManager {
             return this.key;
         }
 
-    }
-
-    /**
-     * 数据源
-     */
-    public enum DataSourceType{
-        /**
-         * 主库
-         */
-        MASTER,
-
-        /**
-         * 从库
-         */
-        SLAVE
     }
 
 }
