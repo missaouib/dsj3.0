@@ -1,5 +1,6 @@
 package com.hanqian.kepler.web.controller.question;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -8,21 +9,27 @@ import cn.hutool.json.JSONUtil;
 import com.hanqian.kepler.common.bean.NameValueVo;
 import com.hanqian.kepler.common.bean.result.AjaxResult;
 import com.hanqian.kepler.common.enums.BaseEnumManager;
+import com.hanqian.kepler.common.jpa.specification.Rule;
+import com.hanqian.kepler.common.jpa.specification.SpecificationFactory;
+import com.hanqian.kepler.common.utils.ExcelUtils;
 import com.hanqian.kepler.core.entity.primary.question.Question;
 import com.hanqian.kepler.core.service.question.QuestionService;
 import com.hanqian.kepler.core.vo.QuestionEchartVo;
+import com.hanqian.kepler.core.vo.QuestionExportVo;
 import com.hanqian.kepler.core.vo.QuestionSearchVo;
 import com.hanqian.kepler.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,13 +123,8 @@ public class QuestionController extends BaseController {
     }
 
 
-
-    /**
-     * 获取到所有医院名列表
-     */
-    @GetMapping("findHospitalNameList")
-    @ResponseBody
-    public AjaxResult findHospitalNameList(){
+    //获取到所有医院列表
+    private List<NameValueVo> findHospitalNameListCommon(){
         List<String> names = EnumUtil.getNames(BaseEnumManager.HospitalName.class);
         List<NameValueVo> nameValueVoList = new ArrayList<>();
         names.forEach(name->{
@@ -130,7 +132,16 @@ public class QuestionController extends BaseController {
             NameValueVo nameValueVo = new NameValueVo(hospitalName.name(), hospitalName.value());
             nameValueVoList.add(nameValueVo);
         });
-        return AjaxResult.success("获取成功", nameValueVoList);
+        return nameValueVoList;
+    }
+
+    /**
+     * 获取到所有医院名列表
+     */
+    @GetMapping("findHospitalNameList")
+    @ResponseBody
+    public AjaxResult findHospitalNameList(){
+        return AjaxResult.success("获取成功", findHospitalNameListCommon());
     }
 
     /**
@@ -210,23 +221,58 @@ public class QuestionController extends BaseController {
     @ResponseBody
     public QuestionEchartVo bar_data(String itemName, QuestionSearchVo questionSearch){
         List<Object[]> objects = questionService.findGroupData(itemName, questionSearch);
-        String[] xList = new String[objects.size()];
-        BigDecimal[] yList = new BigDecimal[objects.size()];
+        String[] xList = new String[]{"非常满意","较满意","一般","不太满意","不满意","未接触"};
+        BigDecimal[] yList = new BigDecimal[]{new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0)};
         for(int i=0;i<objects.size();i++){
             Object[] oArr = objects.get(i);
             String name = String.valueOf(oArr[0]);
             switch (name){
-                case "1": xList[i] = "未接触"; break;
-                case "2": xList[i] = "不满意"; break;
-                case "3": xList[i] = "不太满意"; break;
-                case "4": xList[i] = "一般"; break;
-                case "5": xList[i] = "较满意"; break;
-                case "6": xList[i] = "非常满意"; break;
-                default: xList[i] = "未知";
+                case "6" : yList[0] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
+                case "5" : yList[1] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
+                case "4" : yList[2] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
+                case "3" : yList[3] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
+                case "2" : yList[4] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
+                case "1" : yList[5] = NumberUtil.toBigDecimal(String.valueOf(oArr[1])); break;
             }
-            yList[i] = NumberUtil.toBigDecimal(String.valueOf(oArr[1]));
         }
         return new QuestionEchartVo(xList, yList);
+    }
+
+    /**
+     * excel导出
+     */
+    @GetMapping("export")
+    @ResponseBody
+    public void export(QuestionSearchVo questionSearch) throws IOException {
+        List<QuestionExportVo> exportVoList = questionService.findExportData(questionSearch);
+        List<QuestionExportVo> rows = CollUtil.newArrayList(exportVoList);
+
+        List<NameValueVo> nameValueVos = new ArrayList<>();
+        nameValueVos.add(new NameValueVo("所属医院", "hospitalName"));
+        nameValueVos.add(new NameValueVo("调查对象", "objectType"));
+        nameValueVos.add(new NameValueVo("性别", "sex"));
+        nameValueVos.add(new NameValueVo("年龄段", "ageField"));
+        nameValueVos.add(new NameValueVo("室内环境质量", "qualityIndoor"));
+        nameValueVos.add(new NameValueVo("室外环境质量", "qualityOutdoor"));
+        nameValueVos.add(new NameValueVo("厕所卫生状况", "toiletHygiene"));
+        nameValueVos.add(new NameValueVo("保洁服务态度", "cleanService"));
+        nameValueVos.add(new NameValueVo("日常安保工作", "dailySecurity"));
+        nameValueVos.add(new NameValueVo("意外处置及时性", "accidentalDisposal"));
+        nameValueVos.add(new NameValueVo("安保服务态度", "securityService"));
+        nameValueVos.add(new NameValueVo("菜品价格", "dishPrice"));
+        nameValueVos.add(new NameValueVo("就餐环境", "diningEnvironment"));
+        nameValueVos.add(new NameValueVo("餐饮服务态度", "foodService"));
+        nameValueVos.add(new NameValueVo("送餐的及时性", "deliveryTimeliness"));
+        nameValueVos.add(new NameValueVo("餐品口味营养", "foodNutrition"));
+        nameValueVos.add(new NameValueVo("送餐服务态度", "diningAttitude"));
+        nameValueVos.add(new NameValueVo("运送及时性", "transportTimeliness"));
+        nameValueVos.add(new NameValueVo("运送准确性", "transportAccuracy"));
+        nameValueVos.add(new NameValueVo("运送服务态度", "transportService"));
+        nameValueVos.add(new NameValueVo("维修及时性", "repairTimeliness"));
+        nameValueVos.add(new NameValueVo("维修质量", "repairQuality"));
+        nameValueVos.add(new NameValueVo("电梯运状态", "elevatorStatus"));
+        nameValueVos.add(new NameValueVo("运维服务态度", "operationService"));
+        ExcelUtils.export(response, "问卷调查表", rows, nameValueVos);
     }
 
 }

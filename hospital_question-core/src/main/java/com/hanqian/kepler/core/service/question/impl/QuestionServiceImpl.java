@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.hanqian.kepler.common.base.dao.BaseDao;
 import com.hanqian.kepler.common.base.service.BaseServiceImpl;
 import com.hanqian.kepler.common.bean.NameValueVo;
@@ -14,7 +16,11 @@ import com.hanqian.kepler.core.dao.primary.question.QuestionDao;
 import com.hanqian.kepler.core.entity.primary.question.Question;
 import com.hanqian.kepler.core.service.question.QuestionService;
 import com.hanqian.kepler.core.vo.QuestionEchartVo;
+import com.hanqian.kepler.core.vo.QuestionExportVo;
 import com.hanqian.kepler.core.vo.QuestionSearchVo;
+import org.hibernate.SQLQuery;
+import org.hibernate.query.internal.NativeQueryImpl;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +30,7 @@ import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class QuestionServiceImpl extends BaseServiceImpl<Question, String> implements QuestionService {
@@ -41,18 +48,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     @Override
     public List<Object[]> findGroupData(String itemName, QuestionSearchVo questionSearch) {
         String orderby = StrUtil.equalsAny(itemName, new String[]{"objectType","sex"}) ? "objectTypeSort" : itemName;
-        String whereSql = "";
-        if(questionSearch!=null){
-            if(StrUtil.isNotBlank(questionSearch.getHospitalName())){
-                whereSql += " and q.hospitalName='"+questionSearch.getHospitalName()+"'";
-            }
-            if(StrUtil.isNotBlank(questionSearch.getStartDate())){
-                whereSql += " and q.createTime>='"+questionSearch.getStartDate()+"'";
-            }
-            if(StrUtil.isNotBlank(questionSearch.getEndDate())){
-                whereSql += " and q.createTime<='"+questionSearch.getEndDate()+"'";
-            }
-        }
+        String whereSql = getWhereSearchSql(questionSearch);
 
         String sql = "SELECT q."+itemName+" as \"name\",count(*) as \"value\" FROM hp_question q where q.state='Enable' "+whereSql+" GROUP BY q."+itemName+" order by q."+orderby+" asc";
         Query query = em.createNativeQuery(sql);
@@ -87,5 +83,95 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         }
 
         return count(SpecificationFactory.where(rules));
+    }
+
+    @Override
+    public List<QuestionExportVo> findExportData(QuestionSearchVo questionSearchVo) {
+//        List<Map<String, Object>> voMapList = questionDao.findExportData();
+//        JSONArray jsonArray = JSONUtil.parseArray(voMapList);
+//        return JSONUtil.toList(jsonArray, QuestionExportVo.class);
+
+        String sql = "SELECT \n" +
+                "CASE q.HOSPITALNAME\n" +
+                "\tWHEN 'JZ' THEN '精中医院'\n" +
+                "\tWHEN 'HD' THEN '华东医院'\n" +
+                "\tWHEN 'SY' THEN '第十人民医院'\n" +
+                "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
+                "\tWHEN 'YY' THEN '岳阳医院'\n" +
+                "\tWHEN 'LH' THEN '龙华医院'\n" +
+                "\tWHEN 'XH' THEN '新华医院'\n" +
+                "\tWHEN 'LY' THEN '第六人民医院'\n" +
+                "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "END hospitalName,\n" +
+                "\t\n" +
+                "\tCASE q.OBJECTTYPE\n" +
+                "\t\tWHEN 'Patient' THEN '患者'\n" +
+                "\t\tWHEN 'PatientFamily' THEN '患者家属'\n" +
+                "\t\tWHEN 'Doctor' THEN '医生'\n" +
+                "\t\tWHEN 'Nurse' THEN '护士'\n" +
+                "\t\tWHEN 'MedicalTechnician' THEN '医技人员'\n" +
+                "\t\tWHEN 'Management' THEN '管理人员' ELSE '其他'\n" +
+                "\tEND objectType,\n" +
+                "\n" +
+                "\tCASE q.SEX\n" +
+                "\t\tWHEN 'male' THEN '男'\n" +
+                "\t\tWHEN 'female' THEN '女'\n" +
+                "\tEND sex,\n" +
+                "\n" +
+                "\tCASE q.AGEFIELD\n" +
+                "\t\tWHEN 1 THEN '18岁以下'\n" +
+                "\t\tWHEN 2 THEN '19~40'\n" +
+                "\t\tWHEN 3 THEN '19~40'\n" +
+                "\t\tWHEN 4 THEN '41~60'\n" +
+                "\t\tWHEN 5 THEN '41~60'\n" +
+                "\t\tWHEN 6 THEN '61岁以上'\n" +
+                "\tEND ageField,\n" +
+                "\n" +
+                "\n" +
+                "\tq.QUALITYINDOOR as qualityIndoor,\n" +
+                "\tq.qualityOutdoor as qualityOutdoor,\n" +
+                "\tq.toiletHygiene as toiletHygiene,\n" +
+                "\tq.cleanService as cleanService,\n" +
+                "\tq.dailySecurity as dailySecurity,\n" +
+                "\tq.accidentalDisposal as accidentalDisposal,\n" +
+                "\tq.securityService as securityService,\n" +
+                "\tq.dishPrice as dishPrice,\n" +
+                "\tq.diningEnvironment as diningEnvironment,\n" +
+                "\tq.foodService as foodService,\n" +
+                "\tq.deliveryTimeliness as deliveryTimeliness,\n" +
+                "\tq.foodNutrition as foodNutrition,\n" +
+                "\tq.diningAttitude as diningAttitude,\n" +
+                "\tq.transportTimeliness as transportTimeliness,\n" +
+                "\tq.transportAccuracy as transportAccuracy,\n" +
+                "\tq.transportService as transportService,\n" +
+                "\tq.repairTimeliness as repairTimeliness,\n" +
+                "\tq.repairQuality as repairQuality,\n" +
+                "\tq.elevatorStatus as elevatorStatus,\n" +
+                "\tq.operationService as operationService\n" +
+                "FROM HP_QUESTION q where q.state='Enable'" + getWhereSearchSql(questionSearchVo);
+
+        Query query = em.createNativeQuery(sql);
+//        query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.aliasToBean(QuestionExportVo.class));
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(QuestionExportVo.class)); //虽然过时但是能用，上面注释那个会报NativeQueryImpl类型转换错误
+        List<QuestionExportVo> list = query.getResultList();
+        return list;
+
+    }
+
+    //公共拼接搜索部分sql
+    private String getWhereSearchSql(QuestionSearchVo questionSearchVo){
+        String whereSearchSql = " ";
+        if(questionSearchVo!=null){
+            if(StrUtil.isNotBlank(questionSearchVo.getHospitalName())){
+                whereSearchSql += " and q.hospitalName='"+questionSearchVo.getHospitalName()+"'";
+            }
+            if(StrUtil.isNotBlank(questionSearchVo.getStartDate())){
+                whereSearchSql += " and q.createTime>='"+questionSearchVo.getStartDate()+"'";
+            }
+            if(StrUtil.isNotBlank(questionSearchVo.getEndDate())){
+                whereSearchSql += " and q.createTime<='"+questionSearchVo.getEndDate()+"'";
+            }
+        }
+        return whereSearchSql;
     }
 }

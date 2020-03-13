@@ -18,7 +18,7 @@
                 <a href="index.html" class="navbar-brand">
                     <img src="../static/img/logo.png" alt="Kepler Logo" class="brand-icon">
                     <div class="brand-title">
-                        <span class="brand-text">Kepler</span>
+                        <span class="brand-text">问卷调查表</span>
                     </div>
                 </a>
             </div>
@@ -44,7 +44,7 @@
 
                     <!--Mega dropdown-->
                     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-                    <li class="mega-dropdown">
+                    <li class="mega-dropdown hide">
                         <a href="#" class="mega-dropdown-toggle">
                             <span class="fa fa fa-smile-o fa-lg"></span>
                         </a>
@@ -94,24 +94,24 @@
                                         <i class="fa fa-smile-o fa-lg"></i> 个人中心
                                     </a>
                                 </li>
-                                <li class="pad-top">
-                                    <a href="menu/flow/toDo">
+                                <li class="pad-top hide">
+                                    <a href="menu/flow/toDo" class="">
                                         <span class="badge badge-danger pull-right">9</span>
                                         <i class="fa fa-laptop fa-lg"></i> 代办事项
                                     </a>
                                 </li>
-                                <li>
+                                <li class="hide">
                                     <a href="menu/flow/record?viewtype=1">
                                         <span class="label label-success pull-right">New</span>
                                         <i class="fa fa-file-text-o fa-lg"></i> 已办未结
                                     </a>
                                 </li>
-                                <li>
+                                <li class="hide">
                                     <a href="menu/flow/record?viewtype=2">
                                         <i class="fa fa-file-text fa-lg"></i> 已办已结
                                     </a>
                                 </li>
-                                <li>
+                                <li class="hide">
                                     <a href="menu/flow/draft">
                                         <i class="fa fa-gamepad fa-lg"></i> 我的草稿
                                     </a>
@@ -120,7 +120,7 @@
 
                             <!-- Dropdown footer -->
                             <div class="pad-all text-right">
-                                <a href="pages-login.html" class="btn btn-primary">
+                                <a href="/logout" class="btn btn-primary">
                                     <i class="pli-unlock"></i> Logout
                                 </a>
                             </div>
@@ -302,10 +302,9 @@
                             <!--================================-->
                             <div id="mainnav-profile" class="mainnav-profile">
                                 <div class="profile-wrap">
-                                    <div class="pad-btm">
-                                        <span class="label label-success pull-right">New</span>
-                                        <img class="img-circle img-sm img-border" th:src="${session?.CURRENT_USER?.avatarId}" alt="Profile Picture">
-                                    </div>
+                                    <!--<div class="pad-btm">-->
+                                        <!--<img class="img-circle img-sm img-border" th:src="${session?.CURRENT_USER?.avatarId}" alt="Profile Picture">-->
+                                    <!--</div>-->
                                     <a href="#profile-nav" class="box-block" data-toggle="collapse" aria-expanded="false">
                                             <span class="pull-right dropdown-toggle">
                                                 <i class="dropdown-caret"></i>
@@ -325,40 +324,10 @@
 <!--                                        <i class="pli-information icon-lg icon-fw"></i> Help-->
 <!--                                    </a>-->
                                     <a href="/logout" class="list-group-item">
-                                        <i class="pli-unlock icon-lg icon-fw"></i> Logout
+                                        <i class="pli-unlock icon-lg icon-fw"></i> 退出
                                     </a>
                                 </div>
                             </div>
-
-
-                            <!--Shortcut buttons-->
-                            <!--================================-->
-                            <div id="mainnav-shortcut">
-                                <ul class="list-unstyled">
-                                    <li class="col-xs-3" data-content="My Profile">
-                                        <a class="shortcut-grid" href="#">
-                                            <i class="fa fa-wheelchair fa-lg"></i>
-                                        </a>
-                                    </li>
-                                    <li class="col-xs-3" data-content="Messages">
-                                        <a class="shortcut-grid" href="#">
-                                            <i class="fa fa-thumbs-o-up fa-lg"></i>
-                                        </a>
-                                    </li>
-                                    <li class="col-xs-3" data-content="Activity">
-                                        <a class="shortcut-grid" href="#">
-                                            <i class="fa fa-chain-broken fa-lg"></i>
-                                        </a>
-                                    </li>
-                                    <li class="col-xs-3" data-content="Lock Screen">
-                                        <a class="shortcut-grid" href="#">
-                                            <i class="fa fa-expeditedssl fa-lg"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!--================================-->
-                            <!--End shortcut buttons-->
 
 
                             <ul id="mainnav-menu" class="list-group">
@@ -367,8 +336,8 @@
                                     <a href="menu/sys/dashboard">
                                         <i class="fas fa-grip-horizontal"></i>
                                         <span class="menu-title">
-                                                <strong>工作台</strong>
-											</span>
+                                            <strong>工作台</strong>
+                                        </span>
                                     </a>
                                 </li>
 
@@ -384,48 +353,6 @@
                                         <ul class="collapse" th:unless="${#lists.isEmpty(menu.children)}" th:include="this::tree(${menu.children}, ${level+1})"></ul>
                                     </li>
                                 </th:block>
-
-
-                                <!--Menu list item-->
-                                <li>
-                                    <a href="#">
-                                        <i class="psi-tactic"></i>
-                                        <span class="menu-title">Menu Level</span>
-                                        <i class="arrow"></i>
-                                    </a>
-
-                                    <!--Submenu-->
-                                    <ul class="collapse">
-                                        <li><a href="#">Second Level Item</a></li>
-                                        <li><a href="#">Second Level Item</a></li>
-                                        <li><a href="#">Second Level Item</a></li>
-                                        <li class="list-divider"></li>
-                                        <li>
-                                            <a href="#">Third Level<i class="arrow"></i></a>
-
-                                            <!--Submenu-->
-                                            <ul class="collapse">
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <a href="#">Third Level<i class="arrow"></i></a>
-
-                                            <!--Submenu-->
-                                            <ul class="collapse">
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li class="list-divider"></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                                <li><a href="#">Third Level Item</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
 
 
                                 <li class="list-divider"></li>
@@ -451,15 +378,8 @@
     <!--===================================================-->
     <footer id="footer">
 
-        <!-- Visible when footer positions are fixed -->
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <div class="show-fixed pull-right">
-            You have <a href="#" class="text-bold text-main"><span class="label label-danger">3</span> pending action.</a>
-        </div>
-
-
-        <div class="hide-fixed pull-right pad-rgt">14GB of <strong>512GB</strong> Free.</div>
-        <p class="pad-lft">&#0169; 2020 Your Company</p>
+        <div class="hide-fixed pull-right pad-rgt">question summary</div>
+        <p class="pad-lft">&#0169; 2020 上海汉乾信息技术发展有限公司</p>
 
     </footer>
     <!--===================================================-->

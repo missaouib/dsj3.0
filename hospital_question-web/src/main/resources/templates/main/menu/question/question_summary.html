@@ -30,7 +30,7 @@
 
                     <div class="col-md-2 col-sm-12">
                         <button id="question-search-export" type="button" class="btn btn-success pull-right">导出</button>
-                        <button id="question-search-reset" type="reset" class="btn btn-default pull-right">重置</button>
+                        <button id="question-search-reset" type="reset" class="btn btn-default pull-right mar-rgt">重置</button>
                         <button id="question-search-btn" type="button" class="btn btn-primary pull-right">搜索</button>
                     </div>
                 </form>
@@ -257,6 +257,15 @@
         setTimeout(function(){
             load_echart();
         }, 200);
+    });
+
+    //导出excel
+    $("#question-search-export").on("click", function(){
+        var hospitalName = $("#question_search_form #hospitalName option:selected").val();
+        var startDate = $("#question_search_form #startDate").val();
+        var endDate = $("#question_search_form #endDate").val();
+        var url = "/question/export?hospitalName="+hospitalName+"&startDate="+startDate+"&endDate="+endDate;
+        window.open(url);
     });
 
     //加载统计图（调查对象）
