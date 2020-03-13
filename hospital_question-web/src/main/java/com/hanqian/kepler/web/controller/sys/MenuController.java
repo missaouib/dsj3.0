@@ -45,7 +45,7 @@ public class MenuController extends BaseController {
 	public String menu(Model model, @PathVariable String menu, String type, String parentId) {
 		model.addAttribute("type",type);
 		model.addAttribute("parentId",parentId);
-		return "/main/menu/"+menu;
+		return "main/menu/"+menu;
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class MenuController extends BaseController {
 	public String menu(Model model,String viewtype,String parentId,@PathVariable String menu1, @PathVariable String menu2) {
 		model.addAttribute("viewtype",viewtype);
 		model.addAttribute("parentId",parentId);
-		return "/main/menu/"+menu1+"/"+menu2;
+		return "main/menu/"+menu1+"/"+menu2;
 	}
 
 	// ========================================================================================================================
