@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div id="page-content">
+    <div class="panel">
+        <div class="panel-heading">
+            <h3 class="panel-title">问卷数总览</h3>
+        </div>
+        <div class="panel-body">
+            <!--搜索栏-->
+            <div class="row bord-btm pad-btm">
+                <form id="question_search_form">
+                    <div class="col-md-4 col-sm-12">
+                        <select id="hospitalName" class="form-control" name="hospitalName"></select>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12">
+                        <div class="input-group" id="dateSearchDiv">
+                            <input type="text" class="form-control" name="startDate" id="startDate" placeholder="开始时间">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control" name="endDate" id="endDate" placeholder="结束时间">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12">
+                        <button id="question-search-btn" type="button" class="btn btn-primary pull-right">搜索</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 col-sm-12">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">总问卷数</h3></div>
+                <div class="panel-body">
+                    <div class="col-md-3 text-center">
+                        <h2 id="count_total">0</h2>
+                    </div>
+                    <div class="col-md-9 text-center">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">问卷完成度（患者版）</h3></div>
+                <div class="panel-body">
+                    <div class="col-md-3 text-center">
+                        <h2 id="percent_HUANZHE">0%</h2>
+                    </div>
+                    <div class="col-md-9 text-center" style="margin-top: 28px">
+                        <div class="progress progress-striped"><div style="width: 0%;" class="progress-bar progress-bar-purple" id="percent_HUANZHE_progress"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="panel">
+                <div class="panel-heading"><h3 class="panel-title">问卷完成度（医护人员版）</h3></div>
+                <div class="panel-body">
+                    <div class="col-md-3 text-center">
+                        <h2 id="percent_YIHURENYUAN">0%</h2>
+                    </div>
+                    <div class="col-md-9 text-center" style="margin-top: 28px">
+                        <div class="progress progress-striped"><div style="width: 2%;" class="progress-bar progress-bar-purple" id="percent_YIHURENYUAN_progress"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="panel">
+            <div class="panel-body" id="questionCountBody">
+
+                <div class="jqGrid_wrapper">
+                    <table id="question_count_table"></table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    $(function(){
+        load_hospitalName_select();
+        __laydate_date("startDate");
+        __laydate_date("endDate");
+
+        loadCountData({});
+        load_grid_question_count({});
+    });
+
+
+    //加载医院名搜索下拉框
+    function load_hospitalName_select(){
+        __ajax_get("/question/findHospitalNameList", {}, function(data){
+            if(data && data.state === 1){
+                var opData = [];
+                opData.push({id : "", text : ""});
+                for(var i=0;i<data.data.length;i++){
+                    var option = data.data[i];
+                    opData.push({id : option.name, text : option.value});
+                }
+                __select2("hospitalName", "请选择医院名称", {
+                    data : opData
+                });
+            }else{
+                __toastr_error("获取医院名称列表失败")
+            }
+        })
+    }
+
+    //点击搜索
+    $("#question-search-btn").on("click", function(){
+        var params = $("#question_search_form").serialize();
+        loadCountData(params);
+
+        //刷新表格
+        __reflash_jqgrid("question_count_table", params);
+    });
+
+    //加载数量栏数据
+    function loadCountData(params){
+        __ajax_get("/question/getQuestionCount", params, function(data){
+            if(data){
+                $("#count_total").text(data.count_total);
+                $("#percent_HUANZHE").text(data.percent_HUANZHE + "%");
+                $("#percent_HUANZHE_progress").css("width", data.percent_HUANZHE + "%");
+                $("#percent_YIHURENYUAN").text(data.percent_YIHURENYUAN + "%");
+                $("#percent_YIHURENYUAN_progress").css("width", data.percent_YIHURENYUAN + "%");
+            }else{
+                __toastr_error("获取数据失败");
+            }
+        })
+    }
+
+    //加载表格数据
+    function load_grid_question_count(params){
+        __init_jqgrid('question_count_table', null, '/question/list',
+            ['所属医院', '调查对象', '问卷数量', '最近提交日期', 'id'],
+            [
+                {name: 'hospitalName', index: 'hospitalName', width: 300, sortable: false, search : false, searchoptions: {sopt: ['cn']}},
+                {name: 'objectType', index: 'objectType', width: 300, sortable: false, search : false, searchoptions: {sopt: ['cn']}},
+                {name: 'count', index: 'count', width: 300, sortable: false, search : false, searchoptions: {sopt: ['cn']}},
+                {name: 'maxCreateTime', index: 'maxCreateTime', width: 300, sortable: false, search : false, searchoptions: {sopt: ['cn']}},
+                {name: 'id', index: 'id', width: 100, key: true, hidden: true}
+            ],false,{
+                prmNames : params,
+                gridComplete : function(){
+                    var hospitalName = $("#question_search_form #hospitalName option:selected").val();
+                    if(hospitalName){
+                        $("#question_count_table").setGridParam().showCol("objectType");
+                    }else{
+                        $("#question_count_table").setGridParam().hideCol("objectType");
+                    }
+                    __jqGrid_width("question_count_table", $("#questionCountBody").width());
+                }
+            }
+        );
+    }
+
+</script>
+
+</html>

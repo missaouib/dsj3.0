@@ -145,7 +145,7 @@ public class BaseEnumManager {
      * 医院名
      */
     public enum HospitalName{
-        JZ("精中医院"),
+        JZ("精神卫生中心"),
         HD("华东医院"),
         SY("第十人民医院"),
         DYRM("第一人民医院"),

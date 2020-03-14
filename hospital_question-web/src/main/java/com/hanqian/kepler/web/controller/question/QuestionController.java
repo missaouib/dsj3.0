@@ -1,12 +1,14 @@
 package com.hanqian.kepler.web.controller.question;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.hanqian.kepler.common.bean.NameValueVo;
+import com.hanqian.kepler.common.bean.jqgrid.JqGridReturn;
 import com.hanqian.kepler.common.bean.result.AjaxResult;
 import com.hanqian.kepler.common.enums.BaseEnumManager;
 import com.hanqian.kepler.common.jpa.specification.Rule;
@@ -14,6 +16,7 @@ import com.hanqian.kepler.common.jpa.specification.SpecificationFactory;
 import com.hanqian.kepler.common.utils.ExcelUtils;
 import com.hanqian.kepler.core.entity.primary.question.Question;
 import com.hanqian.kepler.core.service.question.QuestionService;
+import com.hanqian.kepler.core.vo.QuestionCountVo;
 import com.hanqian.kepler.core.vo.QuestionEchartVo;
 import com.hanqian.kepler.core.vo.QuestionExportVo;
 import com.hanqian.kepler.core.vo.QuestionSearchVo;
@@ -31,8 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/question")
@@ -273,6 +275,89 @@ public class QuestionController extends BaseController {
         nameValueVos.add(new NameValueVo("电梯运状态", "elevatorStatus"));
         nameValueVos.add(new NameValueVo("运维服务态度", "operationService"));
         ExcelUtils.export(response, "问卷调查表", rows, nameValueVos);
+    }
+
+    // =========================== 问卷数总览 部分 =================================
+
+    /**
+     * 获取总问卷数、患者版完成度、医护人员版完成度
+     */
+    @GetMapping("getQuestionCount")
+    @ResponseBody
+    public Map<String, Object> getQuestionCount(QuestionSearchVo questionSearchVo){
+        long flagCount = 100l;
+        List<Rule> rules = new ArrayList<>();
+        rules.add(Rule.eq("state", BaseEnumManager.StateEnum.Enable));
+        if(StrUtil.isNotBlank(questionSearchVo.getHospitalName())){
+            rules.add(Rule.eq("hospitalName", questionSearchVo.getHospitalName()));
+        }
+        if(StrUtil.isNotBlank(questionSearchVo.getStartDate())){
+            rules.add(Rule.ge("createTime", DateUtil.parseDate(questionSearchVo.getStartDate())));
+        }
+        if(StrUtil.isNotBlank(questionSearchVo.getEndDate())){
+            rules.add(Rule.le("createTime", DateUtil.parseDate(questionSearchVo.getEndDate())));
+        }
+
+        //总数量
+        long count_total = questionService.count(SpecificationFactory.where(rules));
+
+
+        long count_HUANZHE;double percent_HUANZHE;long count_YIHURENYUAN;double percent_YIHURENYUAN;
+        if(StrUtil.isBlank(questionSearchVo.getHospitalName())){
+            //如果没有选择医院，则所有完成度都为100
+            count_HUANZHE = 0;
+            percent_HUANZHE = 100;
+            count_YIHURENYUAN = 0;
+            percent_YIHURENYUAN = 100;
+        }else{
+
+            //患者版数量
+            List<Rule> rules_HUANZHE = new ArrayList<>(rules);
+            rules_HUANZHE.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Patient, BaseEnumManager.ObjectTypeEnum.PatientFamily}));
+            count_HUANZHE = questionService.count(SpecificationFactory.where(rules_HUANZHE));
+
+            //患者版百分比
+            percent_HUANZHE = NumberUtil.mul(NumberUtil.div(count_HUANZHE, flagCount, 2), 100);
+            if(percent_HUANZHE>100) percent_HUANZHE=100;
+
+            //医护人员版数量
+            List<Rule> rules_YIHURENYUAN = new ArrayList<>(rules);
+            rules_YIHURENYUAN.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Doctor, BaseEnumManager.ObjectTypeEnum.Nurse, BaseEnumManager.ObjectTypeEnum.Other}));
+            count_YIHURENYUAN = questionService.count(SpecificationFactory.where(rules_YIHURENYUAN));
+
+            //医护人员版百分比
+            percent_YIHURENYUAN = NumberUtil.mul(NumberUtil.div(count_YIHURENYUAN, flagCount, 2), 100);
+            if(percent_YIHURENYUAN>100) percent_YIHURENYUAN=100;
+
+        }
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("count_total", count_total);
+        data.put("count_HUANZHE", count_HUANZHE);
+        data.put("percent_HUANZHE", percent_HUANZHE);
+        data.put("count_YIHURENYUAN", count_YIHURENYUAN);
+        data.put("percent_YIHURENYUAN", percent_YIHURENYUAN);
+        return data;
+    }
+
+    /**
+     * 表格数据
+     */
+    @GetMapping("list")
+    @ResponseBody
+    public JqGridReturn list(QuestionSearchVo questionSearchVo){
+        List<Map<String, Object>> dataRows = new ArrayList<>();
+        List<QuestionCountVo> questionCountVoList = questionService.findQuestionCountList(questionSearchVo);
+        questionCountVoList.forEach(count -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", count.getHospitalName());
+            map.put("hospitalName", count.getHospitalName());
+            map.put("objectType", count.getObjectType());
+            map.put("count", count.getCount());
+            map.put("maxCreateTime", count.getMaxCreateTime());
+            dataRows.add(map);
+        });
+        return getJqGridReturn(dataRows, null);
     }
 
 }

@@ -15,6 +15,7 @@ import com.hanqian.kepler.common.jpa.specification.SpecificationFactory;
 import com.hanqian.kepler.core.dao.primary.question.QuestionDao;
 import com.hanqian.kepler.core.entity.primary.question.Question;
 import com.hanqian.kepler.core.service.question.QuestionService;
+import com.hanqian.kepler.core.vo.QuestionCountVo;
 import com.hanqian.kepler.core.vo.QuestionEchartVo;
 import com.hanqian.kepler.core.vo.QuestionExportVo;
 import com.hanqian.kepler.core.vo.QuestionSearchVo;
@@ -93,7 +94,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
 
         String sql = "SELECT \n" +
                 "CASE q.HOSPITALNAME\n" +
-                "\tWHEN 'JZ' THEN '精中医院'\n" +
+                "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
                 "\tWHEN 'HD' THEN '华东医院'\n" +
                 "\tWHEN 'SY' THEN '第十人民医院'\n" +
                 "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
@@ -155,7 +156,76 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(QuestionExportVo.class)); //虽然过时但是能用，上面注释那个会报NativeQueryImpl类型转换错误
         List<QuestionExportVo> list = query.getResultList();
         return list;
+    }
 
+    @Override
+    public List<QuestionCountVo> findQuestionCountList(QuestionSearchVo questionSearchVo) {
+        if(StrUtil.isNotBlank(questionSearchVo.getHospitalName())){
+            return findQuestionCountListOfhospital(questionSearchVo);
+        }
+        String whereSql = getWhereSearchSql(questionSearchVo);
+        String sql = "SELECT \n" +
+                "\n" +
+                "CASE q.HOSPITALNAME\n" +
+                "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
+                "\tWHEN 'HD' THEN '华东医院'\n" +
+                "\tWHEN 'SY' THEN '第十人民医院'\n" +
+                "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
+                "\tWHEN 'YY' THEN '岳阳医院'\n" +
+                "\tWHEN 'LH' THEN '龙华医院'\n" +
+                "\tWHEN 'XH' THEN '新华医院'\n" +
+                "\tWHEN 'LY' THEN '第六人民医院'\n" +
+                "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "END as \"hospitalName\",\n" +
+                "\n" +
+                "'' as \"objectType\",\n" +
+                "\n" +
+                "CAST(count(*) AS CHAR) as \"count\",\n" +
+                "\n" +
+                "DATE_FORMAT(max(q.createTime), '%Y-%m-%d %H:%i') as \"maxCreateTime\"\n" +
+                "\t\n" +
+                "FROM HP_QUESTION q where q.state='Enable' "+whereSql+" GROUP BY q.hospitalName";
+        Query query = em.createNativeQuery(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(QuestionCountVo.class)); //虽然过时但是能用，上面注释那个会报NativeQueryImpl类型转换错误
+        List<QuestionCountVo> list = query.getResultList();
+        return list;
+    }
+
+    @Override
+    public List<QuestionCountVo> findQuestionCountListOfhospital(QuestionSearchVo questionSearchVo) {
+        String whereSql = getWhereSearchSql(questionSearchVo);
+        String sql = "SELECT \n" +
+                "\n" +
+                "CASE q.HOSPITALNAME\n" +
+                "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
+                "\tWHEN 'HD' THEN '华东医院'\n" +
+                "\tWHEN 'SY' THEN '第十人民医院'\n" +
+                "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
+                "\tWHEN 'YY' THEN '岳阳医院'\n" +
+                "\tWHEN 'LH' THEN '龙华医院'\n" +
+                "\tWHEN 'XH' THEN '新华医院'\n" +
+                "\tWHEN 'LY' THEN '第六人民医院'\n" +
+                "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "END as \"hospitalName\",\n" +
+                "\n" +
+                "CASE q.OBJECTTYPE\n" +
+                "\t\tWHEN 'Patient' THEN '患者'\n" +
+                "\t\tWHEN 'PatientFamily' THEN '患者家属'\n" +
+                "\t\tWHEN 'Doctor' THEN '医生'\n" +
+                "\t\tWHEN 'Nurse' THEN '护士'\n" +
+                "\t\tWHEN 'MedicalTechnician' THEN '医技人员'\n" +
+                "\t\tWHEN 'Management' THEN '管理人员' ELSE '其他'\n" +
+                "\tEND as 'objectType',\n" +
+                "\n" +
+                "CAST(count(*) AS CHAR) as \"count\",\n" +
+                "\n" +
+                "DATE_FORMAT(max(q.createTime), '%Y-%m-%d %H:%i') as \"maxCreateTime\"\n" +
+                "\t\n" +
+                "FROM HP_QUESTION q where q.state='Enable' "+whereSql+" GROUP BY q.objectType";
+        Query query = em.createNativeQuery(sql);
+        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(QuestionCountVo.class)); //虽然过时但是能用，上面注释那个会报NativeQueryImpl类型转换错误
+        List<QuestionCountVo> list = query.getResultList();
+        return list;
     }
 
     //公共拼接搜索部分sql

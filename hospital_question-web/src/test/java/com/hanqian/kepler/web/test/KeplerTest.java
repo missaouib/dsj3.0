@@ -82,7 +82,7 @@ public class KeplerTest {
 		Integer[] ageArr = new Integer[]{1, 2, 4, 6};
 		List<String> objectTypeNameList = EnumUtil.getNames(BaseEnumManager.ObjectTypeEnum.class);
 		List<String> sexNameList = EnumUtil.getNames(BaseEnumManager.SexEnum.class);
-		for(int i=0; i<500; i++){
+		for(int i=0; i<300; i++){
 			Question question = new Question();
 			question.setHospitalName(hospitalNameArr[RandomUtil.randomInt(0, hospitalNameArr.length)]);
 			question.setObjectType(BaseEnumManager.ObjectTypeEnum.valueOf(objectTypeNameList.get(RandomUtil.randomInt(0, objectTypeNameList.size()))));
