@@ -153,7 +153,8 @@ public class BaseEnumManager {
         LH("龙华医院"),
         XK("胸科医院"),
         XH("新华医院"),
-        LY("第六人民医院");
+        LY("第六人民医院"),
+        FK("肺科医院");
 
         private final String value;
 

@@ -103,6 +103,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'XH' THEN '新华医院'\n" +
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "\tWHEN 'FK' THEN '肺科医院'\n" +
                 "END hospitalName,\n" +
                 "\t\n" +
                 "\tCASE q.OBJECTTYPE\n" +
@@ -176,6 +177,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'XH' THEN '新华医院'\n" +
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "\tWHEN 'FK' THEN '肺科医院'\n" +
                 "END as \"hospitalName\",\n" +
                 "\n" +
                 "'' as \"objectType\",\n" +
@@ -206,6 +208,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'XH' THEN '新华医院'\n" +
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
+                "\tWHEN 'FK' THEN '肺科医院'\n" +
                 "END as \"hospitalName\",\n" +
                 "\n" +
                 "CASE q.OBJECTTYPE\n" +
