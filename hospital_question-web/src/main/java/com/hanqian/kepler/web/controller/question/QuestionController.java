@@ -62,7 +62,7 @@ public class QuestionController extends BaseController {
         if(ObjectUtil.isNull(question.getSex())) return AjaxResult.error("未获取到性别【sex】");
         if(ObjectUtil.isNull(question.getAgeField())) return AjaxResult.error("未获取到年龄段【ageField】");
 
-        if(questionService.getCountByObjectAndHospitalName(question.getHospitalName(), question.getObjectType())>questionLogMaxCount) return AjaxResult.error("样本数量已充足");
+        if(questionService.getCountByObjectAndHospitalName(question.getHospitalName(), question.getObjectType())>=questionLogMaxCount) return AjaxResult.error("样本数量已充足");
 
         // ======== （保洁服务） ========
         if(ObjectUtil.isNull(question.getQualityIndoor())) return AjaxResult.error("室内环境质量 为空【qualityIndoor】");
@@ -121,7 +121,7 @@ public class QuestionController extends BaseController {
         }catch (Exception e){
             return AjaxResult.error("请检查【调查对象字段值】【objectType】");
         }
-        return questionService.getCountByObjectAndHospitalName(hospitalName, objectTypeEnum)<=questionLogMaxCount ? AjaxResult.success("检查通过") : AjaxResult.warn("样本数量已充足");
+        return questionService.getCountByObjectAndHospitalName(hospitalName, objectTypeEnum)<questionLogMaxCount ? AjaxResult.success("检查通过") : AjaxResult.warn("样本数量已充足");
     }
 
 
