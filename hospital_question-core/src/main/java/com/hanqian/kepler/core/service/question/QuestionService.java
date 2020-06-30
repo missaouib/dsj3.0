@@ -38,4 +38,9 @@ public interface QuestionService extends BaseService<Question, String> {
      */
     List<QuestionCountVo> findQuestionCountListOfhospital(QuestionSearchVo questionSearchVo);
 
+    /**
+     * 查询已经存在有数据的医院数量
+     */
+    int getHospCountEnable(QuestionSearchVo questionSearchVo);
+
 }

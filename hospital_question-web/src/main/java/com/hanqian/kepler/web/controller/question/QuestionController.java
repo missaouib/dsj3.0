@@ -1,6 +1,7 @@
 package com.hanqian.kepler.web.controller.question;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -304,32 +305,31 @@ public class QuestionController extends BaseController {
 
         long count_HUANZHE;double percent_HUANZHE;long count_YIHURENYUAN;double percent_YIHURENYUAN;
         if(StrUtil.isBlank(questionSearchVo.getHospitalName())){
-            //如果没有选择医院，则所有完成度都为100
-            count_HUANZHE = 0;
-            percent_HUANZHE = 100;
-            count_YIHURENYUAN = 0;
-            percent_YIHURENYUAN = 100;
-        }else{
-
-            //患者版数量
-            List<Rule> rules_HUANZHE = new ArrayList<>(rules);
-            rules_HUANZHE.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Patient, BaseEnumManager.ObjectTypeEnum.PatientFamily}));
-            count_HUANZHE = questionService.count(SpecificationFactory.where(rules_HUANZHE));
-
-            //患者版百分比
-            percent_HUANZHE = NumberUtil.mul(NumberUtil.div(count_HUANZHE, flagCount, 2), 100);
-            if(percent_HUANZHE>100) percent_HUANZHE=100;
-
-            //医护人员版数量
-            List<Rule> rules_YIHURENYUAN = new ArrayList<>(rules);
-            rules_YIHURENYUAN.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Doctor, BaseEnumManager.ObjectTypeEnum.Nurse, BaseEnumManager.ObjectTypeEnum.Other}));
-            count_YIHURENYUAN = questionService.count(SpecificationFactory.where(rules_YIHURENYUAN));
-
-            //医护人员版百分比
-            percent_YIHURENYUAN = NumberUtil.mul(NumberUtil.div(count_YIHURENYUAN, flagCount, 2), 100);
-            if(percent_YIHURENYUAN>100) percent_YIHURENYUAN=100;
-
+            //如果没有选择医院，则查询所存在医院数量的总比例
+            //总共已经存在的医院数量
+            int hospCount = questionService.getHospCountEnable(questionSearchVo);
+            if(hospCount > 0){
+                flagCount = Convert.toLong(NumberUtil.mul(flagCount, hospCount));
+            }
         }
+
+        //患者版数量
+        List<Rule> rules_HUANZHE = new ArrayList<>(rules);
+        rules_HUANZHE.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Patient, BaseEnumManager.ObjectTypeEnum.PatientFamily}));
+        count_HUANZHE = questionService.count(SpecificationFactory.where(rules_HUANZHE));
+
+        //患者版百分比
+        percent_HUANZHE = NumberUtil.mul(NumberUtil.div(count_HUANZHE, flagCount, 2), 100);
+        if(percent_HUANZHE>100) percent_HUANZHE=100;
+
+        //医护人员版数量
+        List<Rule> rules_YIHURENYUAN = new ArrayList<>(rules);
+        rules_YIHURENYUAN.add(Rule.in("objectType", new BaseEnumManager.ObjectTypeEnum[]{BaseEnumManager.ObjectTypeEnum.Doctor, BaseEnumManager.ObjectTypeEnum.Nurse, BaseEnumManager.ObjectTypeEnum.Other}));
+        count_YIHURENYUAN = questionService.count(SpecificationFactory.where(rules_YIHURENYUAN));
+
+        //医护人员版百分比
+        percent_YIHURENYUAN = NumberUtil.mul(NumberUtil.div(count_YIHURENYUAN, flagCount, 2), 100);
+        if(percent_YIHURENYUAN>100) percent_YIHURENYUAN=100;
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("count_total", count_total);

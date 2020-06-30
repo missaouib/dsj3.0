@@ -1,5 +1,6 @@
 package com.hanqian.kepler.core.service.question.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -229,6 +230,18 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         query.unwrap(SQLQuery.class).setResultTransformer(Transformers.aliasToBean(QuestionCountVo.class)); //虽然过时但是能用，上面注释那个会报NativeQueryImpl类型转换错误
         List<QuestionCountVo> list = query.getResultList();
         return list;
+    }
+
+    @Override
+    public int getHospCountEnable(QuestionSearchVo questionSearchVo) {
+        String whereSql = getWhereSearchSql(questionSearchVo);
+        String sql = "select count(DISTINCT q.hospitalName) from HP_QUESTION q where q.state='Enable' "+whereSql;
+        Query query = em.createNativeQuery(sql);
+        Object o = query.getSingleResult();
+        if(o != null){
+            return Convert.toInt(o);
+        }
+        return 0;
     }
 
     //公共拼接搜索部分sql
