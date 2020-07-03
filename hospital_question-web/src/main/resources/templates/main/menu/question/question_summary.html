@@ -20,7 +20,7 @@
                         <select id="hospitalName" class="form-control" name="hospitalName"></select>
                     </div>
 
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-5 col-sm-12">
                         <div class="input-group" id="dateSearchDiv">
                             <input type="text" class="form-control" name="startDate" id="startDate" placeholder="开始时间">
                             <span class="input-group-addon">至</span>
@@ -28,7 +28,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-2 col-sm-12">
+                    <div class="col-md-3 col-sm-12">
+                        <button id="question-search-export-summary" type="button" class="btn btn-success pull-right">统计导出</button>
                         <button id="question-search-export" type="button" class="btn btn-success pull-right">导出</button>
                         <button id="question-search-reset" type="reset" class="btn btn-default pull-right mar-rgt">重置</button>
                         <button id="question-search-btn" type="button" class="btn btn-primary pull-right">搜索</button>
@@ -265,6 +266,19 @@
         var startDate = $("#question_search_form #startDate").val();
         var endDate = $("#question_search_form #endDate").val();
         var url = "/question/export?hospitalName="+hospitalName+"&startDate="+startDate+"&endDate="+endDate;
+        window.open(url);
+    });
+
+    //统计导出excel
+    $("#question-search-export-summary").on("click", function(){
+        var hospitalName = $("#question_search_form #hospitalName option:selected").val();
+        if(!hospitalName){
+            __toastr_error("请选择一家医院");
+            return false;
+        }
+        var startDate = $("#question_search_form #startDate").val();
+        var endDate = $("#question_search_form #endDate").val();
+        var url = "/question/exportSummaryCountOfHospital?hospitalName="+hospitalName+"&startDate="+startDate+"&endDate="+endDate;
         window.open(url);
     });
 

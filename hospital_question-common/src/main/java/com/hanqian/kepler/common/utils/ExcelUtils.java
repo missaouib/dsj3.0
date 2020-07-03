@@ -37,11 +37,15 @@ public class ExcelUtils {
 
         ExcelWriter bigWriter = ExcelUtil.getBigWriter();
 
-        for (int i = 0; i < headNameKeyList.size(); i++) {
-            NameValueVo head = headNameKeyList.get(i);
-            bigWriter.addHeaderAlias(head.getValue(), head.getName());
-            bigWriter.setColumnWidth(i, 20);
+        if(headNameKeyList!=null && headNameKeyList.size()>0){
+            for (int i = 0; i < headNameKeyList.size(); i++) {
+                NameValueVo head = headNameKeyList.get(i);
+                bigWriter.addHeaderAlias(head.getValue(), head.getName());
+            }
         }
+
+        //设置单元格宽度，columnIndex<0则设置所有宽度，columnIndex>0则设置对应下标列宽度
+        bigWriter.setColumnWidth(-1, 20);
         // 一次性写出内容，使用默认样式，强制输出标题
         bigWriter.write(projects, true);
         //response为HttpServletResponse对象

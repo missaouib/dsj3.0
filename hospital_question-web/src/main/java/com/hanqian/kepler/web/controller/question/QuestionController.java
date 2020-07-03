@@ -1,13 +1,20 @@
 package com.hanqian.kepler.web.controller.question;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.hanqian.kepler.common.bean.NameValueVo;
 import com.hanqian.kepler.common.bean.jqgrid.JqGridReturn;
 import com.hanqian.kepler.common.bean.result.AjaxResult;
@@ -22,18 +29,24 @@ import com.hanqian.kepler.core.vo.QuestionEchartVo;
 import com.hanqian.kepler.core.vo.QuestionExportVo;
 import com.hanqian.kepler.core.vo.QuestionSearchVo;
 import com.hanqian.kepler.web.controller.BaseController;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.ServletOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -250,6 +263,10 @@ public class QuestionController extends BaseController {
         List<QuestionExportVo> exportVoList = questionService.findExportData(questionSearch);
         List<QuestionExportVo> rows = CollUtil.newArrayList(exportVoList);
 
+        ExcelUtils.export(response, "问卷调查表", rows, getQuestionExportNameValueVoList());
+    }
+
+    private List<NameValueVo> getQuestionExportNameValueVoList(){
         List<NameValueVo> nameValueVos = new ArrayList<>();
         nameValueVos.add(new NameValueVo("所属医院", "hospitalName"));
         nameValueVos.add(new NameValueVo("调查对象", "objectType"));
@@ -275,7 +292,7 @@ public class QuestionController extends BaseController {
         nameValueVos.add(new NameValueVo("维修质量", "repairQuality"));
         nameValueVos.add(new NameValueVo("电梯运状态", "elevatorStatus"));
         nameValueVos.add(new NameValueVo("运维服务态度", "operationService"));
-        ExcelUtils.export(response, "问卷调查表", rows, nameValueVos);
+        return nameValueVos;
     }
 
     // =========================== 问卷数总览 部分 =================================
@@ -358,6 +375,165 @@ public class QuestionController extends BaseController {
             dataRows.add(map);
         });
         return getJqGridReturn(dataRows, null);
+    }
+
+    /**
+     * 单个医院的统计数据导出
+     */
+    @GetMapping("exportSummaryCountOfHospital")
+    @ResponseBody
+    public void exportSummaryCountOfHospital(QuestionSearchVo questionSearchVo, String endDate) throws IOException {
+        if(StrUtil.isBlank(questionSearchVo.getHospitalName())) return;
+		List<Rule> rulesCommon = new ArrayList<>();
+        rulesCommon.add(Rule.eq("state", BaseEnumManager.StateEnum.Enable));
+        rulesCommon.add(Rule.eq("hospitalName", questionSearchVo.getHospitalName()));
+		if(StrUtil.isNotBlank(questionSearchVo.getStartDate())){
+            rulesCommon.add(Rule.ge("createTime", DateUtil.parseDate(questionSearchVo.getStartDate())));
+		}
+		if(StrUtil.isNotBlank(questionSearchVo.getEndDate())){
+            rulesCommon.add(Rule.le("createTime", DateUtil.parseDate(questionSearchVo.getEndDate())));
+		}
+
+
+		//获取到excel模板
+        String path = "/file/export_temp.xlsx";
+        InputStream inputStream = this.getClass().getResourceAsStream(path);
+        File tempFile = FileUtil.writeFromStream(inputStream, "/tmp/excel.xlsx");
+
+
+        //获取到“数据统计”页
+        ExcelWriter excelWriter = ExcelUtil.getWriter(tempFile,"数据统计");
+
+
+        //背景色为蓝色的普通单元格样式
+        CellStyle cellStyleBlue = excelWriter.getOrCreateCellStyle("B12");
+        //背景色为白色的普通单元格样式
+        CellStyle cellStyleWhite = excelWriter.getOrCreateCellStyle("B5");
+
+
+        //第一行大标题
+        String hospName = "";
+		try{
+            hospName = BaseEnumManager.HospitalName.valueOf(questionSearchVo.getHospitalName()).value() + "问卷调查结果统计表";
+        }catch (Exception e){
+            hospName = "问卷调查结果统计表";
+        }
+        CellStyle cellStyleTitle = excelWriter.getOrCreateCellStyle("A1");
+        excelWriter.writeCellValue("A1", hospName);
+        excelWriter.setStyle(cellStyleTitle, "A1");
+
+
+        //统计时间
+        String statisticsTime = "至";
+        if(StrUtil.isNotBlank(questionSearchVo.getStartDate())) statisticsTime = questionSearchVo.getStartDate() + statisticsTime;
+        if(StrUtil.isNotBlank(endDate)) statisticsTime = statisticsTime + endDate;
+        excelWriter.writeCellValue("B2", statisticsTime);
+        excelWriter.setStyle(cellStyleBlue, "B2");
+
+
+        //总数
+        long totalCount = questionService.count(SpecificationFactory.where(rulesCommon));
+        excelWriter.writeCellValue("G2", Convert.toStr(totalCount));
+        excelWriter.setStyle(cellStyleBlue, "G2");
+
+
+        //调查对象数量
+        List<String> objectTypeList = CollectionUtil.newArrayList("Patient","PatientFamily","Doctor","Nurse","Other");
+        List<String> objectTypeLocationList = CollectionUtil.newArrayList("B6","C6","D6","E6","F6");
+        for(int i=0;i<objectTypeList.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon);
+            rules.add(Rule.eq("objectType", BaseEnumManager.ObjectTypeEnum.valueOf(objectTypeList.get(i))));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(objectTypeLocationList.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleBlue, objectTypeLocationList.get(i));
+        }
+
+
+        //性别
+        List<String> sexList = CollectionUtil.newArrayList("male","female");
+        List<String> sexLocationList = CollectionUtil.newArrayList("B8","C8");
+        for(int i=0;i<sexList.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon);
+            rules.add(Rule.eq("sex", BaseEnumManager.SexEnum.valueOf(sexList.get(i))));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(sexLocationList.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleWhite, sexLocationList.get(i));
+        }
+
+
+        //年龄段
+        List<Integer> ageFieldList = CollectionUtil.newArrayList(1,2,4,6);
+        List<String> ageFieldLocationList = CollectionUtil.newArrayList("B10","C10","D10","E10");
+        for(int i=0;i<ageFieldList.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon);
+            rules.add(Rule.eq("ageField", ageFieldList.get(i)));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(ageFieldLocationList.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleBlue, ageFieldLocationList.get(i));
+        }
+
+
+        //满意度调研结果
+        Integer startY = 12;
+        List<Integer> socreList = CollectionUtil.newArrayList(6,5,4,3,2,1);
+        List<String> socreLocationXList = CollectionUtil.newArrayList("B","C","D","E","F","G");
+        List<Dict> scoreTypeDictList = CollectionUtil.newArrayList(
+                Dict.create().set("name", "qualityIndoor").set("desc", "室内环境质量"),
+                Dict.create().set("name", "qualityOutdoor").set("desc", "室外环境质量"),
+                Dict.create().set("name", "toiletHygiene").set("desc", "厕所卫生状况"),
+                Dict.create().set("name", "cleanService").set("desc", "保洁服务态度"),
+                Dict.create().set("name", "dailySecurity").set("desc", "日常安保工作"),
+                Dict.create().set("name", "accidentalDisposal").set("desc", "意外处置及时性"),
+                Dict.create().set("name", "securityService").set("desc", "安保服务态度"),
+                Dict.create().set("name", "dishPrice").set("desc", "菜品价格"),
+                Dict.create().set("name", "diningEnvironment").set("desc", "就餐环境"),
+                Dict.create().set("name", "foodService").set("desc", "餐饮服务态度"),
+                Dict.create().set("name", "deliveryTimeliness").set("desc", "送餐的及时性"),
+                Dict.create().set("name", "foodNutrition").set("desc", "餐品口味营养"),
+                Dict.create().set("name", "transportTimeliness").set("desc", "运送及时性"),
+                Dict.create().set("name", "transportAccuracy").set("desc", "运送准确性"),
+                Dict.create().set("name", "transportService").set("desc", "运送服务态度"),
+                Dict.create().set("name", "repairTimeliness").set("desc", "维修及时性"),
+                Dict.create().set("name", "repairQuality").set("desc", "维修质量"),
+                Dict.create().set("name", "elevatorStatus").set("desc", "电梯运状态"),
+                Dict.create().set("name", "operationService").set("desc", "运维服务态度")
+        );
+
+        for(int i=0;i<scoreTypeDictList.size();i++){
+            ++startY;
+            CellStyle cellStyle = i%2>0 ? cellStyleBlue : cellStyleWhite;
+            excelWriter.writeCellValue("A"+startY, scoreTypeDictList.get(i).getStr("desc"));
+            excelWriter.setStyle(cellStyle, "A"+startY);
+            for(int j=0;j<socreList.size();j++){
+                List<Rule> rules = new ArrayList<>(rulesCommon);
+                rules.add(Rule.eq(scoreTypeDictList.get(i).getStr("name"), socreList.get(j)));
+                long count = questionService.count(SpecificationFactory.where(rules));
+                excelWriter.writeCellValue(socreLocationXList.get(j)+startY, Convert.toStr(count));
+                excelWriter.setStyle(cellStyle, socreLocationXList.get(j)+startY);
+            }
+        }
+
+
+        //源数据
+        excelWriter.setSheet("源数据");
+        List<QuestionExportVo> exportVoList = questionService.findExportData(questionSearchVo);
+        List<QuestionExportVo> rows = CollUtil.newArrayList(exportVoList);
+        List<NameValueVo> headNameKeyList = getQuestionExportNameValueVoList();
+        for (int i = 0; i < headNameKeyList.size(); i++) {
+            NameValueVo head = headNameKeyList.get(i);
+            excelWriter.addHeaderAlias(head.getValue(), head.getName());
+        }
+        excelWriter.setColumnWidth(-1, 20);
+        excelWriter.write(rows, true);
+
+
+        //下载
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+		response.setHeader("Content-Disposition", "attachment;filename=" + new String((hospName + ".xlsx").getBytes(), "iso-8859-1"));
+		ServletOutputStream out = response.getOutputStream();
+		excelWriter.flush(out, true);
+		excelWriter.close();
+		IoUtil.close(out);
     }
 
 }
