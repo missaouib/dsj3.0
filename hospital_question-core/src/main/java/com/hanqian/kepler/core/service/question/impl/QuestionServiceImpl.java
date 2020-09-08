@@ -105,6 +105,23 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
                 "\tWHEN 'FK' THEN '肺科医院'\n" +
+                "\tWHEN 'DYRMYYBY' THEN '第一人民医院北院'\n" +
+                "\tWHEN 'DYRMYYNY' THEN '第一人民医院南院'\n" +
+                "\tWHEN 'SGYYDY' THEN '曙光医院东院'\n" +
+                "\tWHEN 'SGYYXY' THEN '曙光医院西院'\n" +
+                "\tWHEN 'ZYYY' THEN '上海市中医医院'\n" +
+                "\tWHEN 'HDYY' THEN '华东医院'\n" +
+                "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
+                "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
+                "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
+                "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
+                "\tWHEN 'TJYY' THEN '同济医院'\n" +
+                "\tWHEN 'RJYYZY' THEN '瑞金医院总院'\n" +
+                "\tWHEN 'ETEXZX' THEN '儿童医学中心'\n" +
+                "\tWHEN 'ETYYBJXL' THEN '儿童医院北京西路'\n" +
+                "\tWHEN 'DYFYBJYDY' THEN '第一妇婴保健院东院'\n" +
                 "END hospitalName,\n" +
                 "\t\n" +
                 "\tCASE q.OBJECTTYPE\n" +
@@ -179,6 +196,23 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
                 "\tWHEN 'FK' THEN '肺科医院'\n" +
+                "\tWHEN 'DYRMYYBY' THEN '第一人民医院北院'\n" +
+                "\tWHEN 'DYRMYYNY' THEN '第一人民医院南院'\n" +
+                "\tWHEN 'SGYYDY' THEN '曙光医院东院'\n" +
+                "\tWHEN 'SGYYXY' THEN '曙光医院西院'\n" +
+                "\tWHEN 'ZYYY' THEN '上海市中医医院'\n" +
+                "\tWHEN 'HDYY' THEN '华东医院'\n" +
+                "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
+                "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
+                "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
+                "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
+                "\tWHEN 'TJYY' THEN '同济医院'\n" +
+                "\tWHEN 'RJYYZY' THEN '瑞金医院总院'\n" +
+                "\tWHEN 'ETEXZX' THEN '儿童医学中心'\n" +
+                "\tWHEN 'ETYYBJXL' THEN '儿童医院北京西路'\n" +
+                "\tWHEN 'DYFYBJYDY' THEN '第一妇婴保健院东院'\n" +
                 "END as \"hospitalName\",\n" +
                 "\n" +
                 "'' as \"objectType\",\n" +
@@ -210,6 +244,23 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'LY' THEN '第六人民医院'\n" +
                 "\tWHEN 'XK' THEN '胸科医院'\n" +
                 "\tWHEN 'FK' THEN '肺科医院'\n" +
+                "\tWHEN 'DYRMYYBY' THEN '第一人民医院北院'\n" +
+                "\tWHEN 'DYRMYYNY' THEN '第一人民医院南院'\n" +
+                "\tWHEN 'SGYYDY' THEN '曙光医院东院'\n" +
+                "\tWHEN 'SGYYXY' THEN '曙光医院西院'\n" +
+                "\tWHEN 'ZYYY' THEN '上海市中医医院'\n" +
+                "\tWHEN 'HDYY' THEN '华东医院'\n" +
+                "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
+                "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
+                "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
+                "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
+                "\tWHEN 'TJYY' THEN '同济医院'\n" +
+                "\tWHEN 'RJYYZY' THEN '瑞金医院总院'\n" +
+                "\tWHEN 'ETEXZX' THEN '儿童医学中心'\n" +
+                "\tWHEN 'ETYYBJXL' THEN '儿童医院北京西路'\n" +
+                "\tWHEN 'DYFYBJYDY' THEN '第一妇婴保健院东院'\n" +
                 "END as \"hospitalName\",\n" +
                 "\n" +
                 "CASE q.OBJECTTYPE\n" +
