@@ -401,8 +401,37 @@ public class QuestionController extends BaseController {
         File tempFile = FileUtil.writeFromStream(inputStream, "/tmp/excel.xlsx");
 
 
-        //获取到“数据统计”页
-        ExcelWriter excelWriter = ExcelUtil.getWriter(tempFile,"数据统计");
+        //通用满意度调研结果（因为患者版和医生版所对应的XY都相同，可以用同一个，如果后期有修改，要修改为各自的）
+        Integer startY = 12;
+        List<Integer> socreList = CollectionUtil.newArrayList(6,5,4,3,2,1);
+        List<String> socreLocationXList = CollectionUtil.newArrayList("B","C","D","E","F","G");
+        List<Dict> scoreTypeDictList = CollectionUtil.newArrayList(
+                Dict.create().set("name", "qualityIndoor").set("desc", "室内环境质量"),
+                Dict.create().set("name", "qualityOutdoor").set("desc", "室外环境质量"),
+                Dict.create().set("name", "toiletHygiene").set("desc", "厕所卫生状况"),
+                Dict.create().set("name", "cleanService").set("desc", "保洁服务态度"),
+                Dict.create().set("name", "dailySecurity").set("desc", "日常安保工作"),
+                Dict.create().set("name", "accidentalDisposal").set("desc", "意外处置及时性"),
+                Dict.create().set("name", "securityService").set("desc", "安保服务态度"),
+                Dict.create().set("name", "dishPrice").set("desc", "菜品价格"),
+                Dict.create().set("name", "diningEnvironment").set("desc", "就餐环境"),
+                Dict.create().set("name", "foodService").set("desc", "餐饮服务态度"),
+                Dict.create().set("name", "deliveryTimeliness").set("desc", "送餐的及时性"),
+                Dict.create().set("name", "foodNutrition").set("desc", "餐品口味营养"),
+                Dict.create().set("name", "transportTimeliness").set("desc", "运送及时性"),
+                Dict.create().set("name", "transportAccuracy").set("desc", "运送准确性"),
+                Dict.create().set("name", "transportService").set("desc", "运送服务态度"),
+                Dict.create().set("name", "repairTimeliness").set("desc", "维修及时性"),
+                Dict.create().set("name", "repairQuality").set("desc", "维修质量"),
+                Dict.create().set("name", "elevatorStatus").set("desc", "电梯运状态"),
+                Dict.create().set("name", "operationService").set("desc", "运维服务态度")
+        );
+
+
+        // ============================== 获取到“患者版”页 ==============================
+        ExcelWriter excelWriter = ExcelUtil.getWriter(tempFile,"患者版");
+        List<Rule> rulesCommon_huanzhe = new ArrayList<>(rulesCommon);
+        rulesCommon_huanzhe.add(Rule.in("objectType", CollectionUtil.newArrayList(BaseEnumManager.ObjectTypeEnum.Patient, BaseEnumManager.ObjectTypeEnum.PatientFamily)));
 
 
         //背景色为蓝色的普通单元格样式
@@ -432,16 +461,16 @@ public class QuestionController extends BaseController {
 
 
         //总数
-        long totalCount = questionService.count(SpecificationFactory.where(rulesCommon));
+        long totalCount = questionService.count(SpecificationFactory.where(rulesCommon_huanzhe));
         excelWriter.writeCellValue("G2", Convert.toStr(totalCount));
         excelWriter.setStyle(cellStyleBlue, "G2");
 
 
         //调查对象数量
-        List<String> objectTypeList = CollectionUtil.newArrayList("Patient","PatientFamily","Doctor","Nurse","Other");
-        List<String> objectTypeLocationList = CollectionUtil.newArrayList("B6","C6","D6","E6","F6");
+        List<String> objectTypeList = CollectionUtil.newArrayList("Patient","PatientFamily");
+        List<String> objectTypeLocationList = CollectionUtil.newArrayList("B6","C6");
         for(int i=0;i<objectTypeList.size();i++){
-            List<Rule> rules = new ArrayList<>(rulesCommon);
+            List<Rule> rules = new ArrayList<>(rulesCommon_huanzhe);
             rules.add(Rule.eq("objectType", BaseEnumManager.ObjectTypeEnum.valueOf(objectTypeList.get(i))));
             long count = questionService.count(SpecificationFactory.where(rules));
             excelWriter.writeCellValue(objectTypeLocationList.get(i), Convert.toStr(count));
@@ -453,7 +482,7 @@ public class QuestionController extends BaseController {
         List<String> sexList = CollectionUtil.newArrayList("male","female");
         List<String> sexLocationList = CollectionUtil.newArrayList("B8","C8");
         for(int i=0;i<sexList.size();i++){
-            List<Rule> rules = new ArrayList<>(rulesCommon);
+            List<Rule> rules = new ArrayList<>(rulesCommon_huanzhe);
             rules.add(Rule.eq("sex", BaseEnumManager.SexEnum.valueOf(sexList.get(i))));
             long count = questionService.count(SpecificationFactory.where(rules));
             excelWriter.writeCellValue(sexLocationList.get(i), Convert.toStr(count));
@@ -465,7 +494,7 @@ public class QuestionController extends BaseController {
         List<Integer> ageFieldList = CollectionUtil.newArrayList(1,2,4,6);
         List<String> ageFieldLocationList = CollectionUtil.newArrayList("B10","C10","D10","E10");
         for(int i=0;i<ageFieldList.size();i++){
-            List<Rule> rules = new ArrayList<>(rulesCommon);
+            List<Rule> rules = new ArrayList<>(rulesCommon_huanzhe);
             rules.add(Rule.eq("ageField", ageFieldList.get(i)));
             long count = questionService.count(SpecificationFactory.where(rules));
             excelWriter.writeCellValue(ageFieldLocationList.get(i), Convert.toStr(count));
@@ -473,45 +502,111 @@ public class QuestionController extends BaseController {
         }
 
 
-        //满意度调研结果
-        Integer startY = 12;
-        List<Integer> socreList = CollectionUtil.newArrayList(6,5,4,3,2,1);
-        List<String> socreLocationXList = CollectionUtil.newArrayList("B","C","D","E","F","G");
-        List<Dict> scoreTypeDictList = CollectionUtil.newArrayList(
-                Dict.create().set("name", "qualityIndoor").set("desc", "室内环境质量"),
-                Dict.create().set("name", "qualityOutdoor").set("desc", "室外环境质量"),
-                Dict.create().set("name", "toiletHygiene").set("desc", "厕所卫生状况"),
-                Dict.create().set("name", "cleanService").set("desc", "保洁服务态度"),
-                Dict.create().set("name", "dailySecurity").set("desc", "日常安保工作"),
-                Dict.create().set("name", "accidentalDisposal").set("desc", "意外处置及时性"),
-                Dict.create().set("name", "securityService").set("desc", "安保服务态度"),
-                Dict.create().set("name", "dishPrice").set("desc", "菜品价格"),
-                Dict.create().set("name", "diningEnvironment").set("desc", "就餐环境"),
-                Dict.create().set("name", "foodService").set("desc", "餐饮服务态度"),
-                Dict.create().set("name", "deliveryTimeliness").set("desc", "送餐的及时性"),
-                Dict.create().set("name", "foodNutrition").set("desc", "餐品口味营养"),
-                Dict.create().set("name", "transportTimeliness").set("desc", "运送及时性"),
-                Dict.create().set("name", "transportAccuracy").set("desc", "运送准确性"),
-                Dict.create().set("name", "transportService").set("desc", "运送服务态度"),
-                Dict.create().set("name", "repairTimeliness").set("desc", "维修及时性"),
-                Dict.create().set("name", "repairQuality").set("desc", "维修质量"),
-                Dict.create().set("name", "elevatorStatus").set("desc", "电梯运状态"),
-                Dict.create().set("name", "operationService").set("desc", "运维服务态度")
-        );
-
+        //通用满意度调研结果
         for(int i=0;i<scoreTypeDictList.size();i++){
             ++startY;
             CellStyle cellStyle = i%2>0 ? cellStyleBlue : cellStyleWhite;
             excelWriter.writeCellValue("A"+startY, scoreTypeDictList.get(i).getStr("desc"));
             excelWriter.setStyle(cellStyle, "A"+startY);
             for(int j=0;j<socreList.size();j++){
-                List<Rule> rules = new ArrayList<>(rulesCommon);
+                List<Rule> rules = new ArrayList<>(rulesCommon_huanzhe);
                 rules.add(Rule.eq(scoreTypeDictList.get(i).getStr("name"), socreList.get(j)));
                 long count = questionService.count(SpecificationFactory.where(rules));
                 excelWriter.writeCellValue(socreLocationXList.get(j)+startY, Convert.toStr(count));
                 excelWriter.setStyle(cellStyle, socreLocationXList.get(j)+startY);
             }
         }
+
+        // ============================== 获取到“医生版”页 ==============================
+        excelWriter.setSheet("医生版");
+        List<Rule> rulesCommon_yisheng = new ArrayList<>(rulesCommon);
+        rulesCommon_yisheng.add(Rule.in("objectType", CollectionUtil.newArrayList(BaseEnumManager.ObjectTypeEnum.Doctor, BaseEnumManager.ObjectTypeEnum.Nurse, BaseEnumManager.ObjectTypeEnum.Other)));
+
+
+        //背景色为蓝色的普通单元格样式
+        CellStyle cellStyleBlue_yisheng = excelWriter.getOrCreateCellStyle("B12");
+        //背景色为白色的普通单元格样式
+        CellStyle cellStyleWhite_yisheng = excelWriter.getOrCreateCellStyle("B5");
+
+
+        //第一行大标题
+        String hospName_yisheng = "";
+        try{
+            hospName_yisheng = BaseEnumManager.HospitalName.valueOf(questionSearchVo.getHospitalName()).value() + "问卷调查结果统计表";
+        }catch (Exception e){
+            hospName_yisheng = "问卷调查结果统计表";
+        }
+        CellStyle cellStyleTitle_yisheng = excelWriter.getOrCreateCellStyle("A1");
+        excelWriter.writeCellValue("A1", hospName_yisheng);
+        excelWriter.setStyle(cellStyleTitle_yisheng, "A1");
+
+
+        //统计时间
+        if(StrUtil.isNotBlank(questionSearchVo.getStartDate())) statisticsTime = questionSearchVo.getStartDate() + statisticsTime;
+        if(StrUtil.isNotBlank(endDate)) statisticsTime = statisticsTime + endDate;
+        excelWriter.writeCellValue("B2", statisticsTime);
+        excelWriter.setStyle(cellStyleBlue_yisheng, "B2");
+
+
+        //总数
+        long totalCount_yisheng = questionService.count(SpecificationFactory.where(rulesCommon_yisheng));
+        excelWriter.writeCellValue("G2", Convert.toStr(totalCount_yisheng));
+        excelWriter.setStyle(cellStyleBlue_yisheng, "G2");
+
+
+        //调查对象数量
+        List<String> objectTypeList_yisheng = CollectionUtil.newArrayList("Doctor","Nurse","Other");
+        List<String> objectTypeLocationList_yisheng = CollectionUtil.newArrayList("B6","C6","D6");
+        for(int i=0;i<objectTypeLocationList_yisheng.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon_yisheng);
+            rules.add(Rule.eq("objectType", BaseEnumManager.ObjectTypeEnum.valueOf(objectTypeList_yisheng.get(i))));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(objectTypeLocationList_yisheng.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleBlue_yisheng, objectTypeLocationList_yisheng.get(i));
+        }
+
+
+        //性别
+        List<String> sexList_yisheng = CollectionUtil.newArrayList("male","female");
+        List<String> sexLocationList_yisheng = CollectionUtil.newArrayList("B8","C8");
+        for(int i=0;i<sexList_yisheng.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon_yisheng);
+            rules.add(Rule.eq("sex", BaseEnumManager.SexEnum.valueOf(sexList_yisheng.get(i))));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(sexLocationList_yisheng.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleWhite_yisheng, sexLocationList_yisheng.get(i));
+        }
+
+
+        //年龄段
+        List<Integer> ageFieldList_yisheng = CollectionUtil.newArrayList(1,2,4,6);
+        List<String> ageFieldLocationList_yisheng = CollectionUtil.newArrayList("B10","C10","D10","E10");
+        for(int i=0;i<ageFieldList_yisheng.size();i++){
+            List<Rule> rules = new ArrayList<>(rulesCommon_yisheng);
+            rules.add(Rule.eq("ageField", ageFieldList_yisheng.get(i)));
+            long count = questionService.count(SpecificationFactory.where(rules));
+            excelWriter.writeCellValue(ageFieldLocationList_yisheng.get(i), Convert.toStr(count));
+            excelWriter.setStyle(cellStyleBlue_yisheng, ageFieldLocationList_yisheng.get(i));
+        }
+
+
+        //通用满意度调研结果
+        startY = 12;
+        for(int i=0;i<scoreTypeDictList.size();i++){
+            ++startY;
+            CellStyle cellStyle = i%2>0 ? cellStyleBlue_yisheng : cellStyleWhite_yisheng;
+            excelWriter.writeCellValue("A"+startY, scoreTypeDictList.get(i).getStr("desc"));
+            excelWriter.setStyle(cellStyle, "A"+startY);
+            for(int j=0;j<socreList.size();j++){
+                List<Rule> rules = new ArrayList<>(rulesCommon_yisheng);
+                rules.add(Rule.eq(scoreTypeDictList.get(i).getStr("name"), socreList.get(j)));
+                long count = questionService.count(SpecificationFactory.where(rules));
+                excelWriter.writeCellValue(socreLocationXList.get(j)+startY, Convert.toStr(count));
+                excelWriter.setStyle(cellStyle, socreLocationXList.get(j)+startY);
+            }
+        }
+
+        // =================================== 原数据 ===========================================
 
 
         //源数据
