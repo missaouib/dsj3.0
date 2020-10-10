@@ -173,7 +173,8 @@ public class BaseEnumManager {
         RJYYZY("瑞金医院总院"),
         ETEXZX("儿童医学中心"),
         ETYYBJXL("儿童医院北京西路"),
-        DYFYBJYDY("第一妇婴保健院东院");
+        DYFYBJYDY("第一妇婴保健院东院"),
+        JYN("第九人民医院南院");
 
         private final String value;
 
