@@ -96,7 +96,6 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         String sql = "SELECT \n" +
                 "CASE q.HOSPITALNAME\n" +
                 "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
-                "\tWHEN 'HD' THEN '华东医院'\n" +
                 "\tWHEN 'SY' THEN '第十人民医院'\n" +
                 "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
                 "\tWHEN 'YY' THEN '岳阳医院'\n" +
@@ -188,7 +187,6 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\n" +
                 "CASE q.HOSPITALNAME\n" +
                 "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
-                "\tWHEN 'HD' THEN '华东医院'\n" +
                 "\tWHEN 'SY' THEN '第十人民医院'\n" +
                 "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
                 "\tWHEN 'YY' THEN '岳阳医院'\n" +
@@ -237,7 +235,6 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\n" +
                 "CASE q.HOSPITALNAME\n" +
                 "\tWHEN 'JZ' THEN '精神卫生中心'\n" +
-                "\tWHEN 'HD' THEN '华东医院'\n" +
                 "\tWHEN 'SY' THEN '第十人民医院'\n" +
                 "\tWHEN 'DYRM' THEN '第一人民医院'\n" +
                 "\tWHEN 'YY' THEN '岳阳医院'\n" +
