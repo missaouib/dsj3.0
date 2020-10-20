@@ -165,6 +165,7 @@ public class BaseEnumManager {
         JSWSZXXH("精神卫生中心徐汇"),
         JSWSZXMH("精神卫生中心闵行"),
         GWZX("公卫中心"),
+        GWZX2("公卫中心新"),
         RJYYDY("仁济医院东院"),
         RJYYXY("仁济医院西院"),
         RJYYBY("仁济医院北院"),

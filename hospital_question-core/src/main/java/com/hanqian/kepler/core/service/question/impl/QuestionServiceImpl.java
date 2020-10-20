@@ -112,7 +112,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'HDYY' THEN '华东医院'\n" +
                 "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
                 "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
-                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心(v1)'\n" +
+                "\tWHEN 'GWZX2' THEN '公卫中心'\n" +
                 "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
                 "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
                 "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
@@ -203,7 +204,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'HDYY' THEN '华东医院'\n" +
                 "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
                 "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
-                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心(v1)'\n" +
+                "\tWHEN 'GWZX2' THEN '公卫中心'\n" +
                 "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
                 "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
                 "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
@@ -251,7 +253,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                 "\tWHEN 'HDYY' THEN '华东医院'\n" +
                 "\tWHEN 'JSWSZXXH' THEN '精神卫生中心徐汇'\n" +
                 "\tWHEN 'JSWSZXMH' THEN '精神卫生中心闵行'\n" +
-                "\tWHEN 'GWZX' THEN '公卫中心'\n" +
+                "\tWHEN 'GWZX' THEN '公卫中心(v1)'\n" +
+                "\tWHEN 'GWZX2' THEN '公卫中心'\n" +
                 "\tWHEN 'RJYYDY' THEN '仁济医院东院'\n" +
                 "\tWHEN 'RJYYXY' THEN '仁济医院西院'\n" +
                 "\tWHEN 'RJYYBY' THEN '仁济医院北院'\n" +
