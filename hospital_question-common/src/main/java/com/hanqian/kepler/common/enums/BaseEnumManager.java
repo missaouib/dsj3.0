@@ -145,14 +145,12 @@ public class BaseEnumManager {
      * 医院名
      */
     public enum HospitalName{
-        JZ("精神卫生中心"),
         SY("第十人民医院"),
-        DYRM("第一人民医院"),
         YY("岳阳医院"),
         LH("龙华医院"),
         XK("胸科医院"),
         XH("新华医院"),
-        LY("第六人民医院"),
+        LY("第六人民医院总院"),
         FK("肺科医院"),
 
         //第二批
@@ -174,7 +172,19 @@ public class BaseEnumManager {
         ETEXZX("儿童医学中心"),
         ETYYBJXL("儿童医院北京西路"),
         DYFYBJYDY("第一妇婴保健院东院"),
-        JYN("第九人民医院南院");
+        JYN("第九人民医院南院"),
+
+        //第三批
+        LYD("第六人民医院东院"),
+        ETYYLDL("儿童医院泸定路"),
+        HSBY("华山北院"),
+        JYB("第九人民医院北院"),
+        KQBFZYY("口腔病防治医院"),
+        PFBYY("皮肤病医院"),
+        RJYYNY("仁济医院南院"),
+        RUIJINYYBY("瑞金医院北院"),
+        YBFZZX("眼病防治中心");
+
 
         private final String value;
 
